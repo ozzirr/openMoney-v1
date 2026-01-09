@@ -1,0 +1,50 @@
+# OS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig
+
+# React Native
+metro.config.js.bak
+*.iml
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# iOS
+ios/build/
+ios/Pods/
+ios/Podfile.lock
+*.xcworkspace
+*.xcuserstate
+*.xcuserdata/
+DerivedData/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+*.keystore
+
+# Env
+.env
+.env.*

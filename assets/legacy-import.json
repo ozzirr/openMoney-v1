@@ -1,0 +1,1114 @@
+{
+  "version": 1,
+  "wallets": [
+    {
+      "id": 1,
+      "name": "Contanti",
+      "type": "LIQUIDITY",
+      "currency": "EUR",
+      "tag": "Personale",
+      "active": 1
+    },
+    {
+      "id": 2,
+      "name": "Intesa Sanpaolo",
+      "type": "LIQUIDITY",
+      "currency": "EUR",
+      "tag": "Intesa Sanpaolo",
+      "active": 1
+    },
+    {
+      "id": 3,
+      "name": "Intesa Sanpaolo",
+      "type": "INVEST",
+      "currency": "EUR",
+      "tag": "Intesa Sanpaolo",
+      "active": 1
+    },
+    {
+      "id": 4,
+      "name": "TikTok da incassare",
+      "type": "LIQUIDITY",
+      "currency": "EUR",
+      "tag": "Personale",
+      "active": 1
+    },
+    {
+      "id": 5,
+      "name": "Trade Republic",
+      "type": "LIQUIDITY",
+      "currency": "EUR",
+      "tag": "Trade Republic",
+      "active": 1
+    },
+    {
+      "id": 6,
+      "name": "Trade Republic",
+      "type": "INVEST",
+      "currency": "EUR",
+      "tag": "Trade Republic",
+      "active": 1
+    }
+  ],
+  "expense_categories": [
+    {
+      "id": 1,
+      "name": "Abbonamenti"
+    },
+    {
+      "id": 2,
+      "name": "Auto e moto"
+    },
+    {
+      "id": 3,
+      "name": "Casa Roma"
+    }
+  ],
+  "income_entries": [
+    {
+      "id": 1,
+      "name": "Stipendio",
+      "amount": 2350,
+      "start_date": "2026-01-27",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": null,
+      "active": 1,
+      "wallet_id": null
+    }
+  ],
+  "expense_entries": [
+    {
+      "id": 1,
+      "name": "Internet",
+      "amount": 20,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Internet",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 2,
+      "name": "ChatGPT",
+      "amount": 23,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "ChatGPT",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 3,
+      "name": "Glovo Prime",
+      "amount": 5.99,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Glovo Prime",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 4,
+      "name": "SIM",
+      "amount": 10,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "SIM",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 5,
+      "name": "iCloud",
+      "amount": 2.99,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "iCloud",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 6,
+      "name": "Spotify",
+      "amount": 2.5,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Spotify",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 7,
+      "name": "TV x2 dispositivi",
+      "amount": 150,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "YEARLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "TV x2 dispositivi",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 1
+    },
+    {
+      "id": 8,
+      "name": "Luce",
+      "amount": 55,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Luce",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 9,
+      "name": "Gas",
+      "amount": 38,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Gas",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 10,
+      "name": "Assicurazione",
+      "amount": 40.81,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Assicurazione",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 11,
+      "name": "Spazzatura",
+      "amount": 200,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "YEARLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Spazzatura",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 12,
+      "name": "Condominio",
+      "amount": 439,
+      "start_date": "2026-01-08",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 3,
+      "one_shot": 0,
+      "note": "Condominio",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 13,
+      "name": "Mutuo",
+      "amount": 515,
+      "start_date": "2026-01-01",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Mutuo",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    },
+    {
+      "id": 14,
+      "name": "Garage",
+      "amount": 50,
+      "start_date": "2026-01-01",
+      "recurrence_frequency": "MONTHLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Garage",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 2
+    },
+    {
+      "id": 15,
+      "name": "Pulizie e prodotti per casa",
+      "amount": 30,
+      "start_date": "2026-01-01",
+      "recurrence_frequency": "WEEKLY",
+      "recurrence_interval": 1,
+      "one_shot": 0,
+      "note": "Pulizie e prodotti per casa",
+      "active": 1,
+      "wallet_id": null,
+      "expense_category_id": 3
+    }
+  ],
+  "snapshots": [
+    {
+      "id": 1,
+      "date": "2025-01-31"
+    },
+    {
+      "id": 2,
+      "date": "2025-02-28"
+    },
+    {
+      "id": 3,
+      "date": "2025-03-31"
+    },
+    {
+      "id": 4,
+      "date": "2025-04-30"
+    },
+    {
+      "id": 5,
+      "date": "2025-05-31"
+    },
+    {
+      "id": 6,
+      "date": "2025-06-30"
+    },
+    {
+      "id": 7,
+      "date": "2025-07-31"
+    },
+    {
+      "id": 8,
+      "date": "2025-08-31"
+    },
+    {
+      "id": 9,
+      "date": "2025-09-30"
+    },
+    {
+      "id": 10,
+      "date": "2025-10-31"
+    },
+    {
+      "id": 11,
+      "date": "2025-11-30"
+    },
+    {
+      "id": 12,
+      "date": "2025-12-31"
+    },
+    {
+      "id": 13,
+      "date": "2026-01-08"
+    }
+  ],
+  "snapshot_lines": [
+    {
+      "id": 1,
+      "snapshot_id": 13,
+      "wallet_id": 1,
+      "amount": 300
+    },
+    {
+      "id": 2,
+      "snapshot_id": 13,
+      "wallet_id": 2,
+      "amount": 677.92
+    },
+    {
+      "id": 3,
+      "snapshot_id": 13,
+      "wallet_id": 4,
+      "amount": 348.45
+    },
+    {
+      "id": 4,
+      "snapshot_id": 13,
+      "wallet_id": 5,
+      "amount": 118.79
+    },
+    {
+      "id": 5,
+      "snapshot_id": 13,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 6,
+      "snapshot_id": 13,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 7,
+      "snapshot_id": 13,
+      "wallet_id": 3,
+      "amount": 1575
+    },
+    {
+      "id": 8,
+      "snapshot_id": 13,
+      "wallet_id": 6,
+      "amount": 1393
+    },
+    {
+      "id": 9,
+      "snapshot_id": 13,
+      "wallet_id": 6,
+      "amount": 738
+    },
+    {
+      "id": 10,
+      "snapshot_id": 13,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 11,
+      "snapshot_id": 1,
+      "wallet_id": 2,
+      "amount": 5495
+    },
+    {
+      "id": 12,
+      "snapshot_id": 1,
+      "wallet_id": 5,
+      "amount": 0
+    },
+    {
+      "id": 13,
+      "snapshot_id": 1,
+      "wallet_id": 1,
+      "amount": 0
+    },
+    {
+      "id": 14,
+      "snapshot_id": 1,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 15,
+      "snapshot_id": 1,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 16,
+      "snapshot_id": 1,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 17,
+      "snapshot_id": 1,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 18,
+      "snapshot_id": 1,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 19,
+      "snapshot_id": 1,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 20,
+      "snapshot_id": 1,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 21,
+      "snapshot_id": 2,
+      "wallet_id": 2,
+      "amount": 5600
+    },
+    {
+      "id": 22,
+      "snapshot_id": 2,
+      "wallet_id": 5,
+      "amount": 0
+    },
+    {
+      "id": 23,
+      "snapshot_id": 2,
+      "wallet_id": 1,
+      "amount": 0
+    },
+    {
+      "id": 24,
+      "snapshot_id": 2,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 25,
+      "snapshot_id": 2,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 26,
+      "snapshot_id": 2,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 27,
+      "snapshot_id": 2,
+      "wallet_id": 3,
+      "amount": 243
+    },
+    {
+      "id": 28,
+      "snapshot_id": 2,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 29,
+      "snapshot_id": 2,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 30,
+      "snapshot_id": 2,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 31,
+      "snapshot_id": 3,
+      "wallet_id": 2,
+      "amount": 3800
+    },
+    {
+      "id": 32,
+      "snapshot_id": 3,
+      "wallet_id": 5,
+      "amount": 0
+    },
+    {
+      "id": 33,
+      "snapshot_id": 3,
+      "wallet_id": 1,
+      "amount": 0
+    },
+    {
+      "id": 34,
+      "snapshot_id": 3,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 35,
+      "snapshot_id": 3,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 36,
+      "snapshot_id": 3,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 37,
+      "snapshot_id": 3,
+      "wallet_id": 3,
+      "amount": 490
+    },
+    {
+      "id": 38,
+      "snapshot_id": 3,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 39,
+      "snapshot_id": 3,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 40,
+      "snapshot_id": 3,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 41,
+      "snapshot_id": 4,
+      "wallet_id": 2,
+      "amount": 9700
+    },
+    {
+      "id": 42,
+      "snapshot_id": 4,
+      "wallet_id": 5,
+      "amount": 181
+    },
+    {
+      "id": 43,
+      "snapshot_id": 4,
+      "wallet_id": 1,
+      "amount": 0
+    },
+    {
+      "id": 44,
+      "snapshot_id": 4,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 45,
+      "snapshot_id": 4,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 46,
+      "snapshot_id": 4,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 47,
+      "snapshot_id": 4,
+      "wallet_id": 3,
+      "amount": 550
+    },
+    {
+      "id": 48,
+      "snapshot_id": 4,
+      "wallet_id": 6,
+      "amount": 197
+    },
+    {
+      "id": 49,
+      "snapshot_id": 4,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 50,
+      "snapshot_id": 4,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 51,
+      "snapshot_id": 5,
+      "wallet_id": 2,
+      "amount": 8021
+    },
+    {
+      "id": 52,
+      "snapshot_id": 5,
+      "wallet_id": 5,
+      "amount": 238
+    },
+    {
+      "id": 53,
+      "snapshot_id": 5,
+      "wallet_id": 1,
+      "amount": 100
+    },
+    {
+      "id": 54,
+      "snapshot_id": 5,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 55,
+      "snapshot_id": 5,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 56,
+      "snapshot_id": 5,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 57,
+      "snapshot_id": 5,
+      "wallet_id": 3,
+      "amount": 689
+    },
+    {
+      "id": 58,
+      "snapshot_id": 5,
+      "wallet_id": 6,
+      "amount": 281
+    },
+    {
+      "id": 59,
+      "snapshot_id": 5,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 60,
+      "snapshot_id": 5,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 61,
+      "snapshot_id": 6,
+      "wallet_id": 2,
+      "amount": 6559
+    },
+    {
+      "id": 62,
+      "snapshot_id": 6,
+      "wallet_id": 5,
+      "amount": 202
+    },
+    {
+      "id": 63,
+      "snapshot_id": 6,
+      "wallet_id": 1,
+      "amount": 50
+    },
+    {
+      "id": 64,
+      "snapshot_id": 6,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 65,
+      "snapshot_id": 6,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 66,
+      "snapshot_id": 6,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 67,
+      "snapshot_id": 6,
+      "wallet_id": 3,
+      "amount": 754
+    },
+    {
+      "id": 68,
+      "snapshot_id": 6,
+      "wallet_id": 6,
+      "amount": 491
+    },
+    {
+      "id": 69,
+      "snapshot_id": 6,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 70,
+      "snapshot_id": 6,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 71,
+      "snapshot_id": 7,
+      "wallet_id": 2,
+      "amount": 7365
+    },
+    {
+      "id": 72,
+      "snapshot_id": 7,
+      "wallet_id": 5,
+      "amount": 217
+    },
+    {
+      "id": 73,
+      "snapshot_id": 7,
+      "wallet_id": 1,
+      "amount": 30
+    },
+    {
+      "id": 74,
+      "snapshot_id": 7,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 75,
+      "snapshot_id": 7,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 76,
+      "snapshot_id": 7,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 77,
+      "snapshot_id": 7,
+      "wallet_id": 3,
+      "amount": 950
+    },
+    {
+      "id": 78,
+      "snapshot_id": 7,
+      "wallet_id": 6,
+      "amount": 526
+    },
+    {
+      "id": 79,
+      "snapshot_id": 7,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 80,
+      "snapshot_id": 7,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 81,
+      "snapshot_id": 8,
+      "wallet_id": 2,
+      "amount": 5520
+    },
+    {
+      "id": 82,
+      "snapshot_id": 8,
+      "wallet_id": 5,
+      "amount": 421
+    },
+    {
+      "id": 83,
+      "snapshot_id": 8,
+      "wallet_id": 1,
+      "amount": 40
+    },
+    {
+      "id": 84,
+      "snapshot_id": 8,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 85,
+      "snapshot_id": 8,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 86,
+      "snapshot_id": 8,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 87,
+      "snapshot_id": 8,
+      "wallet_id": 3,
+      "amount": 1057
+    },
+    {
+      "id": 88,
+      "snapshot_id": 8,
+      "wallet_id": 6,
+      "amount": 680
+    },
+    {
+      "id": 89,
+      "snapshot_id": 8,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 90,
+      "snapshot_id": 8,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 91,
+      "snapshot_id": 9,
+      "wallet_id": 2,
+      "amount": 2403
+    },
+    {
+      "id": 92,
+      "snapshot_id": 9,
+      "wallet_id": 5,
+      "amount": 34
+    },
+    {
+      "id": 93,
+      "snapshot_id": 9,
+      "wallet_id": 1,
+      "amount": 10
+    },
+    {
+      "id": 94,
+      "snapshot_id": 9,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 95,
+      "snapshot_id": 9,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 96,
+      "snapshot_id": 9,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 97,
+      "snapshot_id": 9,
+      "wallet_id": 3,
+      "amount": 1162
+    },
+    {
+      "id": 98,
+      "snapshot_id": 9,
+      "wallet_id": 6,
+      "amount": 800
+    },
+    {
+      "id": 99,
+      "snapshot_id": 9,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 100,
+      "snapshot_id": 9,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 101,
+      "snapshot_id": 10,
+      "wallet_id": 2,
+      "amount": 3162
+    },
+    {
+      "id": 102,
+      "snapshot_id": 10,
+      "wallet_id": 5,
+      "amount": 5
+    },
+    {
+      "id": 103,
+      "snapshot_id": 10,
+      "wallet_id": 1,
+      "amount": 80
+    },
+    {
+      "id": 104,
+      "snapshot_id": 10,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 105,
+      "snapshot_id": 10,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 106,
+      "snapshot_id": 10,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 107,
+      "snapshot_id": 10,
+      "wallet_id": 3,
+      "amount": 1348
+    },
+    {
+      "id": 108,
+      "snapshot_id": 10,
+      "wallet_id": 6,
+      "amount": 1460
+    },
+    {
+      "id": 109,
+      "snapshot_id": 10,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 110,
+      "snapshot_id": 10,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 111,
+      "snapshot_id": 11,
+      "wallet_id": 2,
+      "amount": 1500
+    },
+    {
+      "id": 112,
+      "snapshot_id": 11,
+      "wallet_id": 5,
+      "amount": 109
+    },
+    {
+      "id": 113,
+      "snapshot_id": 11,
+      "wallet_id": 1,
+      "amount": 50
+    },
+    {
+      "id": 114,
+      "snapshot_id": 11,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 115,
+      "snapshot_id": 11,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 116,
+      "snapshot_id": 11,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 117,
+      "snapshot_id": 11,
+      "wallet_id": 3,
+      "amount": 1420
+    },
+    {
+      "id": 118,
+      "snapshot_id": 11,
+      "wallet_id": 6,
+      "amount": 1766
+    },
+    {
+      "id": 119,
+      "snapshot_id": 11,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 120,
+      "snapshot_id": 11,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 121,
+      "snapshot_id": 12,
+      "wallet_id": 2,
+      "amount": 1746
+    },
+    {
+      "id": 122,
+      "snapshot_id": 12,
+      "wallet_id": 5,
+      "amount": 36
+    },
+    {
+      "id": 123,
+      "snapshot_id": 12,
+      "wallet_id": 1,
+      "amount": 275
+    },
+    {
+      "id": 124,
+      "snapshot_id": 12,
+      "wallet_id": 4,
+      "amount": 0
+    },
+    {
+      "id": 125,
+      "snapshot_id": 12,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 126,
+      "snapshot_id": 12,
+      "wallet_id": 3,
+      "amount": 0
+    },
+    {
+      "id": 127,
+      "snapshot_id": 12,
+      "wallet_id": 3,
+      "amount": 1534
+    },
+    {
+      "id": 128,
+      "snapshot_id": 12,
+      "wallet_id": 6,
+      "amount": 1867
+    },
+    {
+      "id": 129,
+      "snapshot_id": 12,
+      "wallet_id": 6,
+      "amount": 0
+    },
+    {
+      "id": 130,
+      "snapshot_id": 12,
+      "wallet_id": 6,
+      "amount": 0
+    }
+  ]
+}
