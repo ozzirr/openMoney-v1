@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
@@ -22,41 +22,77 @@ export default function RecurrencesTableCard({ rows, onPressRow }: Props): JSX.E
       {rows.length === 0 ? (
         <Text style={[styles.empty, { color: tokens.colors.muted }]}>Nessun movimento programmato.</Text>
       ) : (
-        <View style={styles.table}>
-          <View style={styles.headerRow}>
-            <Text style={[styles.headerCell, { color: tokens.colors.muted }]}>Data</Text>
-            <Text style={[styles.headerCell, { color: tokens.colors.muted }]}>Tipo</Text>
-            <Text style={[styles.headerCell, { color: tokens.colors.muted }]}>Categoria</Text>
-            <Text style={[styles.headerCell, { color: tokens.colors.muted }]}>Descrizione</Text>
-            <Text style={[styles.headerCell, { color: tokens.colors.muted }]}>Importo</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.table}>
+          <View>
+            <View style={styles.headerRow}>
+              <Text
+                style={[styles.headerCell, { color: tokens.colors.muted }, styles.cellAmount, styles.headerAmount]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Importo
+              </Text>
+              <Text
+                style={[styles.headerCell, { color: tokens.colors.muted }, styles.cellDate]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Data
+              </Text>
+              <Text
+                style={[styles.headerCell, { color: tokens.colors.muted }, styles.cellType]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Tipo
+              </Text>
+              <Text
+                style={[styles.headerCell, { color: tokens.colors.muted }, styles.cellCategory]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Categoria
+              </Text>
+              <Text
+                style={[styles.headerCell, { color: tokens.colors.muted }, styles.cellDesc]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Descrizione
+              </Text>
+            </View>
+            {rows.map((item, index) => {
+              const amountColor = item.type === "income" ? tokens.colors.green : tokens.colors.red;
+              return (
+                <React.Fragment key={item.id}>
+                  <PressScale onPress={() => onPressRow?.(item)} style={styles.row}>
+                    <Text style={[styles.cell, styles.cellAmount, { color: amountColor }]}>
+                      {formatEUR(item.amount)}
+                    </Text>
+                    <Text style={[styles.cell, { color: tokens.colors.text }, styles.cellDate]}>
+                      {formatShortDate(item.date)}
+                    </Text>
+                    <View style={[styles.cell, styles.cellType]}>
+                      <Chip
+                        label={item.type === "income" ? "Entrata" : "Uscita"}
+                        tone={item.type === "income" ? "green" : "red"}
+                      />
+                    </View>
+                    <Text style={[styles.cell, { color: tokens.colors.text }, styles.cellCategory]} numberOfLines={1}>
+                      {item.category}
+                    </Text>
+                    <Text style={[styles.cell, { color: tokens.colors.muted }, styles.cellDesc]} numberOfLines={1}>
+                      {item.description}
+                    </Text>
+                  </PressScale>
+                  {index < rows.length - 1 ? (
+                    <View style={[styles.separator, { backgroundColor: tokens.colors.border }]} />
+                  ) : null}
+                </React.Fragment>
+              );
+            })}
           </View>
-          {rows.map((item, index) => {
-            const amountColor = item.type === "income" ? tokens.colors.green : tokens.colors.red;
-            return (
-              <React.Fragment key={item.id}>
-                <PressScale onPress={() => onPressRow?.(item)} style={styles.row}>
-                  <View style={styles.rowTop}>
-                    <Text style={[styles.date, { color: tokens.colors.text }]}>{formatShortDate(item.date)}</Text>
-                    <Text style={[styles.amount, { color: amountColor }]}>{formatEUR(item.amount)}</Text>
-                  </View>
-                  <View style={styles.rowChips}>
-                    <Chip label={item.type === "income" ? "Entrata" : "Uscita"} tone={item.type === "income" ? "green" : "red"} />
-                    {item.recurring ? <Chip label="Ric." tone="blue" /> : null}
-                  </View>
-                  <Text style={[styles.category, { color: tokens.colors.text }]} numberOfLines={1}>
-                    {item.category}
-                  </Text>
-                  <Text style={[styles.description, { color: tokens.colors.muted }]} numberOfLines={2}>
-                    {item.description}
-                  </Text>
-                </PressScale>
-                {index < rows.length - 1 ? (
-                  <View style={[styles.separator, { backgroundColor: tokens.colors.border }]} />
-                ) : null}
-              </React.Fragment>
-            );
-          })}
-        </View>
+        </ScrollView>
       )}
     </PremiumCard>
   );
@@ -65,43 +101,61 @@ export default function RecurrencesTableCard({ rows, onPressRow }: Props): JSX.E
 const styles = StyleSheet.create({
   table: {
     gap: 12,
+    paddingBottom: 2,
   },
   headerRow: {
     flexDirection: "row",
+    alignItems: "center",
     paddingBottom: 8,
-    gap: 12,
+    flexWrap: "nowrap",
   },
   headerCell: {
     fontSize: 12,
     fontWeight: "600",
+    minWidth: 0,
   },
   row: {
-    paddingVertical: 8,
-    gap: 6,
-  },
-  rowTop: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 8,
+    flexWrap: "nowrap",
+    width: 470,
   },
-  rowChips: {
+  cell: {
+    fontSize: 12,
+    minWidth: 0,
+  },
+  cellDate: {
+    width: 64,
+    flexShrink: 0,
+    marginRight: 6,
+  },
+  cellType: {
+    width: 100,
     flexDirection: "row",
-    gap: 8,
+    alignItems: "center",
+    flexShrink: 0,
+    gap: 6,
+    marginRight: 0,
   },
-  date: {
-    fontSize: 12,
-    fontWeight: "600",
+  cellCategory: {
+    width: 140,
+    flexShrink: 1,
+    marginRight: 6,
   },
-  amount: {
-    fontSize: 13,
+  cellDesc: {
+    width: 150,
+    flexShrink: 1,
+    marginRight: 6,
+  },
+  cellAmount: {
+    width: 88,
+    textAlign: "left",
     fontWeight: "700",
+    flexShrink: 0,
   },
-  category: {
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  description: {
-    fontSize: 12,
+  headerAmount: {
+    textAlign: "left",
   },
   separator: {
     height: 1,
