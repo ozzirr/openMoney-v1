@@ -2,10 +2,11 @@ import React, { useCallback, useContext, useEffect, useMemo, useState } from "re
 import { Alert, Platform, RefreshControl, ScrollView } from "react-native";
 import { Button, Card, List, SegmentedButtons, Switch, Text, TextInput } from "react-native-paper";
 import * as FileSystem from "expo-file-system";
+import * as LegacyFileSystem from "expo-file-system/legacy";
 import * as DocumentPicker from "expo-document-picker";
 import * as Sharing from "expo-sharing";
 import * as Clipboard from "expo-clipboard";
-import { exportToFile, importFromFile, importFromJson } from "@/importExport";
+import { exportToFile, exportToJson, importFromFile, importFromJson } from "@/importExport";
 import { runMigrations } from "@/db/db";
 import GlassCard from "@/ui/components/GlassCard";
 import { createWallet, deleteWallet, ensureDefaultWallets, listWallets, updateWallet } from "@/repositories/walletsRepo";
@@ -72,6 +73,8 @@ export default function SettingsScreen(): JSX.Element {
     setMessage(null);
     const fileName = "mymoney-export.json";
     try {
+      const payload = await exportToJson();
+      const json = JSON.stringify(payload, null, 2);
       if (Platform.OS === "android" && FileSystem.StorageAccessFramework?.requestDirectoryPermissionsAsync) {
         const permission = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (!permission.granted || !permission.directoryUri) {
@@ -83,17 +86,33 @@ export default function SettingsScreen(): JSX.Element {
           fileName,
           "application/json"
         );
-        await exportToFile(fileUri);
+        if (FileSystem.StorageAccessFramework.writeAsStringAsync) {
+          await FileSystem.StorageAccessFramework.writeAsStringAsync(fileUri, json);
+        } else {
+          await LegacyFileSystem.writeAsStringAsync(fileUri, json);
+        }
         setMessage("Export completato.");
         return;
       }
-      const baseDir = FileSystem.cacheDirectory ?? FileSystem.documentDirectory;
+      const cacheDir = FileSystem.cacheDirectory ?? LegacyFileSystem.cacheDirectory;
+      const docDir = FileSystem.documentDirectory ?? LegacyFileSystem.documentDirectory;
+      let baseDir = cacheDir ?? docDir ?? FileSystem.temporaryDirectory ?? LegacyFileSystem.temporaryDirectory;
+      if (!baseDir && FileSystem.getInfoAsync) {
+        if (docDir) {
+          const info = await FileSystem.getInfoAsync(docDir);
+          if (info.exists) baseDir = docDir;
+        }
+        if (!baseDir && cacheDir) {
+          const info = await FileSystem.getInfoAsync(cacheDir);
+          if (info.exists) baseDir = cacheDir;
+        }
+      }
       if (!baseDir) {
-        setMessage("Permesso necessario per salvare il file.");
+        setMessage("Impossibile salvare il file su questo dispositivo.");
         return;
       }
       const path = `${baseDir}${fileName}`;
-      await exportToFile(path);
+      await LegacyFileSystem.writeAsStringAsync(path, json);
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(path, { mimeType: "application/json", dialogTitle: "Esporta dati" });
         setMessage("Export completato.");
