@@ -9,6 +9,7 @@ import * as Sharing from "expo-sharing";
 import * as Clipboard from "expo-clipboard";
 import { exportToFile, exportToJson, importFromFile, importFromJson } from "@/importExport";
 import { runMigrations } from "@/db/db";
+import { loadSampleData as seedSampleData } from "@/seed/sampleData";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import PressScale from "@/ui/dashboard/components/PressScale";
@@ -266,6 +267,17 @@ export default function SettingsScreen(): JSX.Element {
     await load();
     setMessage("Reset completato.");
   };
+
+  const loadSampleDataHandler = useCallback(async () => {
+    setMessage(null);
+    try {
+      await seedSampleData();
+      await load();
+      setMessage("Dati di esempio caricati.");
+    } catch (error) {
+      setMessage((error as Error).message);
+    }
+  }, [load]);
 
   const addWallet = async (type: "LIQUIDITY" | "INVEST") => {
     if (!newWalletDraft.name.trim()) return;
@@ -787,6 +799,9 @@ export default function SettingsScreen(): JSX.Element {
             </Button>
             <Button mode="outlined" textColor={tokens.colors.text} onPress={pasteFromClipboard}>
               Incolla JSON dagli appunti
+            </Button>
+            <Button mode="contained" buttonColor={tokens.colors.accent} onPress={loadSampleDataHandler}>
+              Carica dati di test
             </Button>
             <Button mode="outlined" textColor={tokens.colors.red} onPress={resetData}>
               Reset

@@ -1,5 +1,6 @@
-import { listOccurrencesInRange } from "@/domain/recurrence";
+import { listOccurrencesInRange, upcomingOccurrences } from "@/domain/recurrence";
 import type { IncomeEntry } from "@/repositories/types";
+import { sampleExpenseEntries, sampleIncomeEntries } from "./fixtures/sampleData";
 
 describe("recurrence", () => {
   test("monthly clamped for end-of-month", () => {
@@ -30,5 +31,18 @@ describe("recurrence", () => {
 
     const dates = listOccurrencesInRange(entry, "2025-06-01", "2025-06-30");
     expect(dates).toEqual(["2025-06-15"]);
+  });
+
+  test("upcoming occurrences reflect the sample dataset", () => {
+    const occurrences = upcomingOccurrences(sampleIncomeEntries, sampleExpenseEntries, 10, "2025-01-01");
+
+    expect(occurrences).toHaveLength(10);
+    expect(occurrences[0]).toEqual(
+      expect.objectContaining({ date: "2025-01-01", type: "expense", name: "Affitto" })
+    );
+    expect(occurrences.some((occurrence) => occurrence.name === "Stipendio" && occurrence.type === "income")).toBe(
+      true
+    );
+    expect(occurrences.some((occurrence) => occurrence.name === "Affitto" && occurrence.type === "expense")).toBe(true);
   });
 });
