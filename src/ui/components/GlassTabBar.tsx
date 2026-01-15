@@ -5,6 +5,7 @@ import { BlurView } from "expo-blur";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Text, useTheme } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDashboardTheme } from "@/ui/dashboard/theme";
 
 const ICONS: Record<string, string> = {
   Dashboard: "view-grid",
@@ -15,12 +16,13 @@ const ICONS: Record<string, string> = {
 
 export default function GlassTabBar({ state, descriptors, navigation }: BottomTabBarProps): JSX.Element {
   const theme = useTheme();
+  const { tokens } = useDashboardTheme();
   const insets = useSafeAreaInsets();
   const isDark = theme.dark;
   const blurTint = isDark ? "dark" : "light";
-  const blurIntensity = isDark ? 40 : 60;
-  const barBg = isDark ? "rgba(10, 11, 18, 0.92)" : "rgba(255, 255, 255, 0.92)";
-  const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(30, 40, 60, 0.12)";
+  const blurIntensity = 35;
+  const barBg = isDark ? "rgba(15, 18, 30, 0.55)" : "rgba(169, 124, 255, 0.32)";
+  const borderColor = isDark ? theme.colors.outline : "rgba(169, 124, 255, 0.5)";
   const inactiveColor = isDark ? theme.colors.onSurface : "#1E2430";
   return (
     <View style={[styles.wrap, { bottom: insets.bottom + 12 }]} pointerEvents="box-none">
@@ -32,7 +34,7 @@ export default function GlassTabBar({ state, descriptors, navigation }: BottomTa
           {
             borderColor,
             backgroundColor: barBg,
-            paddingBottom: Math.max(12, insets.bottom + 6),
+            paddingBottom: Math.max(10, insets.bottom),
           },
         ]}
       >
@@ -86,27 +88,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bar: {
-    borderRadius: 40,
+    borderRadius: tokens.radius.lg,
     borderWidth: 1,
-    paddingTop: 12,
-    paddingHorizontal: 20,
+    paddingTop: 2,
+    paddingBottom: 2,
+    paddingHorizontal: 18,
     width: "92%",
     maxWidth: 520,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOpacity: 0.16,
-    shadowOffset: { width: 0, height: 12 },
-    shadowRadius: 24,
-    elevation: 12,
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 10,
+    elevation: 7,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-around",
+    alignItems: "center",
   },
   item: {
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 10,
+    paddingVertical: 4,
     paddingHorizontal: 6,
     minWidth: 70,
   },
