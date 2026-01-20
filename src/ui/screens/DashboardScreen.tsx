@@ -124,11 +124,12 @@ export default function DashboardScreen(): JSX.Element {
       const chartPoints = Number.isFinite(chartPointsRaw) ? Math.min(12, Math.max(3, chartPointsRaw)) : 6;
       const data = buildDashboardData({
         latestLines,
-        snapshots: snapshots.slice(-chartPoints),
+        snapshots,
         snapshotLines,
         incomeEntries,
         expenseEntries,
         expenseCategories,
+        chartPoints,
       });
       setDashboard(data);
 

@@ -21,6 +21,7 @@ type DashboardInput = {
   incomeEntries: IncomeEntry[];
   expenseEntries: ExpenseEntry[];
   expenseCategories: ExpenseCategory[];
+  chartPoints: number;
 };
 
 const palette = ["#9B7BFF", "#5C9DFF", "#F6C177", "#66D19E", "#C084FC", "#FF8FAB", "#6EE7B7", "#94A3B8"];
@@ -32,34 +33,52 @@ function toMonthKey(year: number, month: number): string {
 function buildPortfolioSeries(
   snapshots: Snapshot[],
   snapshotLines: Record<number, SnapshotLineDetail[]>,
-  latestLines: SnapshotLineDetail[]
+  latestLines: SnapshotLineDetail[],
+  limit: number
 ): PortfolioPoint[] {
-  const points = snapshots
-    .map((snapshot) => {
+  const snapshotByMonth = new Map<string, Snapshot>();
+  snapshots.forEach((snapshot) => {
+    const monthKey = snapshot.date.slice(0, 7);
+    const existing = snapshotByMonth.get(monthKey);
+    if (!existing || snapshot.date > existing.date) {
+      snapshotByMonth.set(monthKey, snapshot);
+    }
+  });
+
+  const now = new Date();
+  const safeLimit = Math.max(1, Math.min(12, limit));
+  const monthKeys: string[] = Array.from({ length: safeLimit }, (_, index) => {
+    const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  });
+
+  const currentMonthKey = monthKeys[0];
+  const totalsForMonth = (monthKey: string): ReturnType<typeof totalsByWalletType> | null => {
+    const snapshot = snapshotByMonth.get(monthKey);
+    if (snapshot) {
       const lines = snapshotLines[snapshot.id] ?? [];
-      const totals = totalsByWalletType(lines);
-      return {
-        date: snapshot.date,
+      return totalsByWalletType(lines);
+    }
+    if (monthKey === currentMonthKey && latestLines.length > 0) {
+      return totalsByWalletType(latestLines);
+    }
+    return null;
+  };
+
+  const points: PortfolioPoint[] = [];
+  monthKeys
+    .slice()
+    .reverse()
+    .forEach((monthKey) => {
+      const totals = totalsForMonth(monthKey);
+      if (!totals) return;
+      points.push({
+        date: `${monthKey}-01`,
         total: totals.netWorth,
         liquidity: totals.liquidity,
         investments: totals.investments,
-      };
-    })
-    .sort((a, b) => (a.date < b.date ? -1 : 1));
-  const now = new Date();
-  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-  const hasCurrentMonthPoint = points.some((point) => point.date.startsWith(currentMonthKey));
-  if (!hasCurrentMonthPoint && latestLines.length > 0) {
-    const totals = totalsByWalletType(latestLines);
-    const currentMonthDate = `${currentMonthKey}-01`;
-    points.push({
-      date: currentMonthDate,
-      total: totals.netWorth,
-      liquidity: totals.liquidity,
-      investments: totals.investments,
+      });
     });
-    points.sort((a, b) => (a.date < b.date ? -1 : 1));
-  }
   return points;
 }
 
@@ -211,7 +230,12 @@ function buildRecurrences(
 }
 
 export function buildDashboardData(input: DashboardInput): DashboardData {
-  const portfolio = buildPortfolioSeries(input.snapshots, input.snapshotLines, input.latestLines);
+  const portfolio = buildPortfolioSeries(
+    input.snapshots,
+    input.snapshotLines,
+    input.latestLines,
+    input.chartPoints
+  );
   const kpis = buildKpis(input.latestLines, portfolio);
   const distributions = buildDistribution(input.latestLines);
   const cashflowMonths = buildCashflow(input.incomeEntries, input.expenseEntries);
