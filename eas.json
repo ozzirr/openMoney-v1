@@ -2,6 +2,18 @@
   "build": {
     "production": {
       "distribution": "store"
+    },
+    "free": {
+      "distribution": "store",
+      "env": {
+        "APP_VARIANT": "free"
+      }
+    },
+    "pro": {
+      "distribution": "store",
+      "env": {
+        "APP_VARIANT": "pro"
+      }
     }
   }
 }

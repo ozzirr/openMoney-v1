@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
-import { Button, List, SegmentedButtons, Text, TextInput } from "react-native-paper";
+import { Button, Dialog, List, Portal, SegmentedButtons, Snackbar, Text, TextInput } from "react-native-paper";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import PressScale from "@/ui/dashboard/components/PressScale";
@@ -16,6 +16,8 @@ import {
 } from "@/repositories/expenseCategoriesRepo";
 import { getPreference } from "@/repositories/preferencesRepo";
 import type { Wallet, Currency, ExpenseCategory } from "@/repositories/types";
+import { APP_VARIANT, LIMITS } from "@/config/entitlements";
+import { openProStoreLink } from "@/config/storeLinks";
 
 type CategoryEdit = {
   name: string;
@@ -64,6 +66,8 @@ export default function WalletScreen(): JSX.Element {
   });
   const [expandedWalletId, setExpandedWalletId] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [limitDialogVisible, setLimitDialogVisible] = useState(false);
+  const [storeErrorVisible, setStoreErrorVisible] = useState(false);
 
   const load = useCallback(async () => {
     const [walletList, expenseCats] = await Promise.all([listWallets(), listExpenseCategories()]);
@@ -103,20 +107,6 @@ export default function WalletScreen(): JSX.Element {
     setRefreshing(false);
   }, [load]);
 
-  const addWallet = async (type: "LIQUIDITY" | "INVEST") => {
-    if (!newWalletDraft.name.trim()) return;
-    await createWallet(
-      newWalletDraft.name.trim(),
-      type,
-      newWalletDraft.currency,
-      type === "INVEST" ? newWalletDraft.tag.trim() || null : null,
-      1
-    );
-    setNewWalletDraft({ name: "", tag: "", currency: "EUR" });
-    setShowAddWallet((prev) => ({ ...prev, [type]: false }));
-    await load();
-  };
-
   const addCategory = async () => {
     if (!newCategory.trim()) return;
     await createExpenseCategory(newCategory.trim(), newCategoryColor);
@@ -146,6 +136,58 @@ export default function WalletScreen(): JSX.Element {
     () => wallets.filter((wallet) => wallet.type === "INVEST"),
     [wallets]
   );
+
+  const getWalletCount = (type: "LIQUIDITY" | "INVEST") =>
+    type === "LIQUIDITY" ? liquidityWallets.length : investmentWallets.length;
+  const getLimitForType = (type: "LIQUIDITY" | "INVEST") =>
+    type === "LIQUIDITY" ? LIMITS.liquidityWallets : LIMITS.investmentWallets;
+  const hasReachedLimit = (type: "LIQUIDITY" | "INVEST") => {
+    const limit = getLimitForType(type);
+    if (limit === null) return false;
+    return getWalletCount(type) >= limit;
+  };
+  const canCreateWallet = (type: "LIQUIDITY" | "INVEST") => !hasReachedLimit(type);
+
+  const addWallet = async (type: "LIQUIDITY" | "INVEST") => {
+    if (!newWalletDraft.name.trim()) return;
+    if (APP_VARIANT === "free" && !canCreateWallet(type)) {
+      setLimitDialogVisible(true);
+      return;
+    }
+    await createWallet(
+      newWalletDraft.name.trim(),
+      type,
+      newWalletDraft.currency,
+      type === "INVEST" ? newWalletDraft.tag.trim() || null : null,
+      1
+    );
+    setNewWalletDraft({ name: "", tag: "", currency: "EUR" });
+    setShowAddWallet((prev) => ({ ...prev, [type]: false }));
+    await load();
+  };
+
+  const handleRequestAddWallet = (type: "LIQUIDITY" | "INVEST") => {
+    if (APP_VARIANT === "pro") {
+      setShowAddWallet((prev) => ({ ...prev, [type]: true }));
+      return;
+    }
+
+    if (!canCreateWallet(type)) {
+      setLimitDialogVisible(true);
+      return;
+    }
+
+    setShowAddWallet((prev) => ({ ...prev, [type]: true }));
+  };
+
+  const handleOpenProStore = useCallback(async () => {
+    try {
+      await openProStoreLink();
+      setLimitDialogVisible(false);
+    } catch {
+      setStoreErrorVisible(true);
+    }
+  }, []);
 
   const inputProps = {
     mode: "outlined" as const,
@@ -181,11 +223,7 @@ export default function WalletScreen(): JSX.Element {
             {tab === "LIQUIDITY" && (
               <>
                 {!showAddWallet.LIQUIDITY && (
-                  <Button
-                    mode="contained"
-                    buttonColor={tokens.colors.accent}
-                    onPress={() => setShowAddWallet((prev) => ({ ...prev, LIQUIDITY: true }))}
-                  >
+                  <Button mode="contained" buttonColor={tokens.colors.accent} onPress={() => handleRequestAddWallet("LIQUIDITY")}>
                     Aggiungi wallet
                   </Button>
                 )}
@@ -302,11 +340,7 @@ export default function WalletScreen(): JSX.Element {
             {tab === "INVEST" && (
               <>
                 {!showAddWallet.INVEST && (
-                  <Button
-                    mode="contained"
-                    buttonColor={tokens.colors.accent}
-                    onPress={() => setShowAddWallet((prev) => ({ ...prev, INVEST: true }))}
-                  >
+                  <Button mode="contained" buttonColor={tokens.colors.accent} onPress={() => handleRequestAddWallet("INVEST")}>
                     Aggiungi wallet
                   </Button>
                 )}
@@ -545,7 +579,26 @@ export default function WalletScreen(): JSX.Element {
           </View>
         </PremiumCard>
 
+        <Portal>
+          <Dialog visible={limitDialogVisible} onDismiss={() => setLimitDialogVisible(false)}>
+            <Dialog.Title>Limite raggiunto</Dialog.Title>
+            <Dialog.Content>
+              <Text>Limite raggiunto. Scarica OpenMoney Pro per wallet illimitati.</Text>
+            </Dialog.Content>
+            <Dialog.Actions>
+              <Button mode="contained" buttonColor={tokens.colors.accent} onPress={handleOpenProStore}>
+                Scarica Pro
+              </Button>
+              <Button mode="text" onPress={() => setLimitDialogVisible(false)}>
+                Chiudi
+              </Button>
+            </Dialog.Actions>
+          </Dialog>
+        </Portal>
 
+        <Snackbar visible={storeErrorVisible} onDismiss={() => setStoreErrorVisible(false)} duration={4000}>
+          Impossibile aprire lo store.
+        </Snackbar>
       </ScrollView>
     </View>
   );
