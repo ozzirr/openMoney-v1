@@ -79,6 +79,7 @@ export default function ({ config }: ConfigContext): ExpoConfig {
       infoPlist: {
         ...iosInfoPlistRest,
         NSFaceIDUsageDescription: FACE_ID_USAGE_DESCRIPTION,
+        ITSAppUsesNonExemptEncryption: false,
       },
     },
     android: {

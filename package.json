@@ -13,7 +13,6 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "expo-splash-screen": "~0.23.0",
     "@expo/vector-icons": "^15.0.3",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
@@ -21,7 +20,7 @@
     "@react-navigation/native": "^6.1.9",
     "@react-navigation/native-stack": "^6.9.12",
     "debug": "^4.4.3",
-    "expo": "~54.0.31",
+    "expo": "~54.0.32",
     "expo-blur": "~15.0.8",
     "expo-clipboard": "~8.0.8",
     "expo-crypto": "^15.0.8",
@@ -31,6 +30,7 @@
     "expo-local-authentication": "^17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-sharing": "~14.0.8",
+    "expo-splash-screen": "~31.0.13",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
     "punycode": "^2.3.1",

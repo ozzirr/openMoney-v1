@@ -1,15 +1,27 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
-    "production": {
-      "distribution": "store"
-    },
     "free": {
-      "distribution": "store",
+      "distribution": "internal",
       "env": {
         "APP_VARIANT": "free"
       }
     },
     "pro": {
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "pro"
+      }
+    },
+    "freeStore": {
+      "distribution": "store",
+      "env": {
+        "APP_VARIANT": "free"
+      }
+    },
+    "proStore": {
       "distribution": "store",
       "env": {
         "APP_VARIANT": "pro"
