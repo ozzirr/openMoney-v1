@@ -31,14 +31,16 @@
   "submit": {
     "freeStore": {
       "ios": {
-        "bundleIdentifier": "com.ozzirr.openmoney",
+        "bundleIdentifier": "com.andrearizzo.balance",
         "appleTeamId": "G6G624VHBN",
-        "ascAppId": "6758161320"
+        "ascAppId": "6758206139"
       }
     },
     "proStore": {
       "ios": {
-        "appleTeamId": "G6G624VHBN"
+        "bundleIdentifier": "com.andrearizzo.balance.pro",
+        "appleTeamId": "G6G624VHBN",
+        "ascAppId": "6758208812"
       }
     }
   }

@@ -1,7 +1,7 @@
 import { Linking, Platform } from "react-native";
 
-const IOS_PRO_STORE_URL = "https://apps.apple.com/app/openmoney-pro/idTODO"; // TODO: replace with actual App Store URL
-const ANDROID_PRO_STORE_URL = "https://play.google.com/store/apps/details?id=com.ozzirr.openmoneypro"; // TODO: replace with actual Play Store URL
+const IOS_PRO_STORE_URL = "https://apps.apple.com/app/balance-pro/idTODO"; // TODO: replace with actual App Store URL
+const ANDROID_PRO_STORE_URL = "https://play.google.com/store/apps/details?id=com.andrearizzo.balance.pro"; // TODO: replace with actual Play Store URL
 
 const PRO_STORE_LINKS = {
   ios: IOS_PRO_STORE_URL,

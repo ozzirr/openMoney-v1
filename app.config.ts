@@ -30,15 +30,15 @@ const VARIANT_CONFIG: Record<AppVariant, {
 }> = {
   free: {
     name: "Balance",
-    scheme: "openmoney",
-    iosBundleIdentifier: "com.ozzirr.openmoney",
-    androidPackage: "com.ozzirr.openmoney",
+    scheme: "balance",
+    iosBundleIdentifier: "com.andrearizzo.balance",
+    androidPackage: "com.andrearizzo.balance",
   },
   pro: {
-    name: "Balance Pro",
-    scheme: "openmoneypro",
-    iosBundleIdentifier: "com.ozzirr.openmoneypro",
-    androidPackage: "com.ozzirr.openmoneypro",
+    name: "Balance",
+    scheme: "balancepro",
+    iosBundleIdentifier: "com.andrearizzo.balance.pro",
+    androidPackage: "com.andrearizzo.balance.pro",
   },
 };
 
