@@ -274,6 +274,13 @@
     "actions": {
       "limitTitle": "Limit reached",
       "limitBody": "Limit reached. Download Balance Pro for unlimited wallets.",
+      "limitModalTitle": "Wallet limit reached",
+      "limitModalSubtitle": "You've reached the maximum number of wallets available in the free version.",
+      "limitBenefitUnlimited": "Unlimited wallets",
+      "limitBenefitInsights": "Advanced insights",
+      "limitBenefitControl": "Full control over your finances",
+      "limitUpgradeCta": "Upgrade to Balance Pro",
+      "limitMaybeLater": "Maybe later",
       "downloadPro": "Download Pro",
       "storeError": "Unable to open the store."
     },

@@ -274,6 +274,13 @@
     "actions": {
       "limitTitle": "Limite raggiunto",
       "limitBody": "Limite raggiunto. Scarica Balance Pro per wallet illimitati.",
+      "limitModalTitle": "Limite wallet raggiunto",
+      "limitModalSubtitle": "Hai raggiunto il numero massimo di wallet disponibili nella versione gratuita.",
+      "limitBenefitUnlimited": "Wallet illimitati",
+      "limitBenefitInsights": "Approfondimenti avanzati",
+      "limitBenefitControl": "Pieno controllo delle tue finanze",
+      "limitUpgradeCta": "Passa a Balance Pro",
+      "limitMaybeLater": "Magari dopo",
       "downloadPro": "Scarica Pro",
       "storeError": "Impossibile aprire lo store."
     },

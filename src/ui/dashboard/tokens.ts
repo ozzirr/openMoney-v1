@@ -7,10 +7,13 @@ export type DashboardTokens = {
     text: string;
     muted: string;
     accent: string;
+    accentPurple: string;
     green: string;
     red: string;
     yellow: string;
     blue: string;
+    modalGlassBg: string;
+    modalBorder: string;
   };
   spacing: {
     xs: number;
@@ -64,10 +67,13 @@ export function createDashboardTokens(isDark: boolean): DashboardTokens {
           text: "#EAF0F9",
           muted: "#9BA6B5",
           accent: "#A97CFF",
+          accentPurple: "#C4A5FF",
           green: "#66D19E",
           red: "#F08C7A",
           yellow: "#F6C177",
           blue: "#6BA3FF",
+          modalGlassBg: "rgba(22,27,38,0.78)",
+          modalBorder: "rgba(255,255,255,0.12)",
         }
       : {
           bg: "#F5F7FB",
@@ -77,10 +83,13 @@ export function createDashboardTokens(isDark: boolean): DashboardTokens {
           text: "#101522",
           muted: "#5E6B7A",
           accent: "#A97CFF",
+          accentPurple: "#9E7BFF",
           green: "#1E9D66",
           red: "#E15A4F",
           yellow: "#E0A12F",
           blue: "#2A7DE1",
+          modalGlassBg: "rgba(255,255,255,0.9)",
+          modalBorder: "rgba(16,24,40,0.08)",
         },
     ...baseTokens,
   };

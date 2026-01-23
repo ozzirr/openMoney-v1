@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
-import { Button, Dialog, List, Portal, SegmentedButtons, Snackbar, Text, TextInput } from "react-native-paper";
+import { Button, List, SegmentedButtons, Snackbar, Text, TextInput } from "react-native-paper";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import PressScale from "@/ui/dashboard/components/PressScale";
@@ -20,6 +20,7 @@ import { APP_VARIANT, LIMITS } from "@/config/entitlements";
 import { openProStoreLink } from "@/config/storeLinks";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/settings/useSettings";
+import LimitReachedModal from "@/ui/components/LimitReachedModal";
 
 type CategoryEdit = {
   name: string;
@@ -70,7 +71,7 @@ export default function WalletScreen(): JSX.Element {
   });
   const [expandedWalletId, setExpandedWalletId] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [limitDialogVisible, setLimitDialogVisible] = useState(false);
+  const [limitModalVisible, setLimitModalVisible] = useState(false);
   const [storeErrorVisible, setStoreErrorVisible] = useState(false);
   useEffect(() => {
     if (!showInvestments) {
@@ -161,7 +162,7 @@ export default function WalletScreen(): JSX.Element {
   const addWallet = async (type: "LIQUIDITY" | "INVEST") => {
     if (!newWalletDraft.name.trim()) return;
     if (APP_VARIANT === "free" && !canCreateWallet(type)) {
-      setLimitDialogVisible(true);
+      setLimitModalVisible(true);
       return;
     }
     await createWallet(
@@ -183,7 +184,7 @@ export default function WalletScreen(): JSX.Element {
     }
 
     if (!canCreateWallet(type)) {
-      setLimitDialogVisible(true);
+      setLimitModalVisible(true);
       return;
     }
 
@@ -193,7 +194,7 @@ export default function WalletScreen(): JSX.Element {
   const handleOpenProStore = useCallback(async () => {
     try {
       await openProStoreLink();
-      setLimitDialogVisible(false);
+      setLimitModalVisible(false);
     } catch {
       setStoreErrorVisible(true);
     }
@@ -591,22 +592,11 @@ export default function WalletScreen(): JSX.Element {
           </View>
         </PremiumCard>
 
-        <Portal>
-          <Dialog visible={limitDialogVisible} onDismiss={() => setLimitDialogVisible(false)}>
-            <Dialog.Title>{t("wallets.actions.limitTitle")}</Dialog.Title>
-            <Dialog.Content>
-              <Text>{t("wallets.actions.limitBody")}</Text>
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button mode="contained" buttonColor={tokens.colors.accent} onPress={handleOpenProStore}>
-                {t("wallets.actions.downloadPro")}
-              </Button>
-              <Button mode="text" onPress={() => setLimitDialogVisible(false)}>
-                {t("common.close")}
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        </Portal>
+        <LimitReachedModal
+          visible={limitModalVisible}
+          onClose={() => setLimitModalVisible(false)}
+          onUpgrade={handleOpenProStore}
+        />
 
         <Snackbar visible={storeErrorVisible} onDismiss={() => setStoreErrorVisible(false)} duration={4000}>
           {t("wallets.actions.storeError")}
