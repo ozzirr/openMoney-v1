@@ -1,18 +1,18 @@
-# Balance
+# Balance App / iOS Android
 
 Balance is an open-source, offline-first personal finance app built with React Native and Expo. It keeps every wallet, transaction, and insight on your device while still offering a polished native experience.
 
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-org-or-username>/openMoney-v1.git
-cd openMoney-v1
+git clone https://github.com/<your-org-or-username>/balance-app-v1.git
+cd balance-app-v1
 npm ci
 npx expo start
 ```
 
 - Scan the QR code with Expo Go (iOS/Android) to preview.
-- Run `APP_VARIANT=free|pro npm run <script>` or `npx eas build -p ios --profile freeStore` to target each variant with the proper limits.
+- Run `APP_VARIANT=free|pro npm run <script>` to target each variant with the proper limits.
 
 ## Contribution
 
