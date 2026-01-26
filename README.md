@@ -5,7 +5,7 @@ Balance is an open-source, offline-first personal finance app built with React N
 ## Quick start
 
 ```bash
-git clone https://github.com/<your-org-or-username>/balance-app-v1.git
+git clone xxx
 cd balance-app-v1
 npm ci
 npx expo start
