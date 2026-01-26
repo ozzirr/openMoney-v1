@@ -13,7 +13,11 @@ export default function KPIStrip({ items }: Props): JSX.Element {
   return (
     <View style={[styles.row, { gap: tokens.spacing.sm }]}>
       {items.map((item) => (
-        <KPICard key={item.id} item={item} />
+        <KPICard
+          key={item.id}
+          item={item}
+          emphasizeValue={item.id === "netWorth"}
+        />
       ))}
     </View>
   );

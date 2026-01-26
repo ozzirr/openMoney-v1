@@ -16,6 +16,32 @@
     "update": "Update",
     "reset": "Reset"
   },
+  "onboardingV2": {
+    "common": {
+      "continue": "Continue",
+      "skip": "Skip"
+    },
+    "welcome": {
+      "title": "Welcome to Balance",
+      "subtitle": "Your personal finances. Simple, private, under control.",
+      "bullet1": "Track income and expenses clearly",
+      "bullet2": "See your net worth over time",
+      "bullet3": "No account. No cloud. No tracking"
+    },
+    "name": {
+      "title": "What’s your name?",
+      "subtitle": "We’ll use it to welcome you to Balance.",
+      "placeholder": "Your name"
+    },
+    "investments": {
+      "title": "Do you have investments?",
+      "subtitle": "This helps us set up your dashboard in the best way.",
+      "optionYes": "Yes, I have investments",
+      "optionNo": "No, only cash",
+      "helper": "You can change this anytime.",
+      "cta": "Get started"
+    }
+  },
   "errors": {
     "genericTitle": "Error",
     "generic": "Something went wrong"
@@ -76,88 +102,6 @@
     },
     "reset": "Reset"
   },
-  "onboarding": {
-    "intro": {
-      "slide1": {
-        "title": "Welcome to Balance",
-        "subtitle": "Your personal finance in one place. Free forever.",
-        "bullet1": "Full control of your recurring income and expenses",
-        "bullet2": "Detailed charts and reports for your entire portfolio and beyond"
-      },
-      "slide2": {
-        "title": "Open source and transparent",
-        "subtitle": "Public GitHub repo you can check anytime.",
-        "bullet1": "Open code",
-        "bullet2": "No hidden logic"
-      },
-      "slide3": {
-        "title": "Privacy by Design",
-        "subtitle": "Offline-first, works without connection. Your data stays on device.",
-        "bullet1": "No accounts",
-        "bullet2": "No cloud",
-        "bullet3": "No tracking"
-      },
-      "slide4": {
-        "title": "Let’s get started",
-        "subtitle": "A few steps to configure Balance."
-      },
-      "skipTitle": "Skip setup?",
-      "skipMessage": "You can do it later from the profile screen.",
-      "skip": "Skip for now",
-      "start": "Start"
-    },
-    "wallets": {
-      "title": "Wallets",
-      "subtitle": "Choose where you keep money and enter your first balance.",
-      "liquidityTitle": "Liquidity wallet",
-      "liquidityNameLabel": "Wallet name",
-      "initialBalanceLabel": "Initial balance",
-      "nameRequired": "Enter a name",
-      "invalidNumber": "Enter a valid number",
-      "investmentsTitle": "I have investments",
-      "investmentNameLabel": "Investment name",
-      "investmentBalanceLabel": "Initial balance",
-      "addInvestment": "Add an investment"
-    },
-    "categories": {
-      "title": "Categories",
-      "subtitle": "Select the categories you will use from the start.",
-      "defaultTitle": "Default categories",
-      "addedTitle": "Added categories",
-      "addLabel": "Add category",
-      "categoryNameLabel": "Category name",
-      "addButton": "Add"
-    },
-    "recurrence": {
-      "title": "Recurring income",
-      "subtitle": "Enter your main income that arrives every month.",
-      "destinationLabel": "Destination wallet",
-      "incomeNameLabel": "Income name",
-      "amountLabel": "Amount",
-      "amountError": "Enter an amount greater than zero",
-      "nextDateLabel": "Next date",
-      "frequencyInfo": "Frequency: monthly"
-    },
-    "expenses": {
-      "title": "Add your expenses",
-      "subtitle": "Enter at least two outflows to track your initial spending.",
-      "counter": "{{count}}/3 (recommended)",
-      "expenseTitle": "Expense {{index}}",
-      "recurringLabel": "Recurring",
-      "titleLabel": "Title",
-      "amountLabel": "Amount",
-      "categoryLabel": "Category",
-      "walletLabel": "Wallet",
-      "dateLabel": "Date",
-      "nextDateLabel": "Next date",
-      "addAnother": "Add another expense"
-    },
-    "done": {
-      "title": "Ready!",
-      "subtitle": "You set up wallets, categories, incomes, and initial expenses. Head to the dashboard to continue.",
-      "button": "Go to dashboard"
-    }
-  },
   "dashboard": {
     "errorTitle": "Unable to load the dashboard",
     "emptyTitle": "No data available",
@@ -179,6 +123,12 @@
         "investments": "Investments"
       },
       "empty": "No data available."
+    },
+    "privacy": {
+      "title": "Privacy by design",
+      "body": "Offline-first. Data stays on your device. Open source and verifiable code on GitHub.",
+      "dismiss": "Got it",
+      "learnMore": "Learn more"
     },
     "distribution": {
       "empty": "No data available.",
@@ -263,6 +213,7 @@
       "newInvestTitle": "New investment wallet",
       "categoriesTitle": "Expense categories",
       "newCategoryLabel": "New category",
+      "addCategory": "Add",
       "noCategories": "No categories configured.",
       "categoryActive": "Active"
     },
@@ -325,6 +276,7 @@
       "toggleForm": "Add or edit entries"
     },
     "empty": {
+      "noEntries": "No entries.",
       "noCategoriesActive": "No active categories. Add one below."
     },
     "validation": {
@@ -369,6 +321,15 @@
   },
   "snapshot": {
     "title": "Snapshot",
+    "hero": {
+      "currentMonth": "Current Month",
+      "recentMonths": "Recent months",
+      "saved": "Saved",
+      "missing": "Missing"
+    },
+    "summary": {
+      "title": "Summary"
+    },
     "actions": {
       "new": "New snapshot",
       "edit": "Edit snapshot",
@@ -382,7 +343,8 @@
       "emptyLines": "No lines."
     },
     "empty": {
-      "noSnapshots": "No snapshots yet."
+      "noSnapshots": "No snapshots yet.",
+      "firstHint": "After setting up wallets, add your first snapshot here."
     },
     "form": {
       "dateLabel": "Date"

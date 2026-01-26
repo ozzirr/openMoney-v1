@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { LayoutAnimation, Platform, RefreshControl, ScrollView, StyleSheet, UIManager, View } from "react-native";
+import { Alert, LayoutAnimation, Platform, RefreshControl, ScrollView, StyleSheet, UIManager, View } from "react-native";
 import { Text } from "react-native-paper";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { listWallets } from "@/repositories/walletsRepo";
@@ -89,6 +89,7 @@ export default function DashboardScreen(): JSX.Element {
   const [profileName, setProfileName] = useState("");
   const [sectionStates, setSectionStates] = useState<Record<string, boolean>>(DEFAULT_SECTION_STATES);
   const [sectionsLoaded, setSectionsLoaded] = useState(false);
+  const [showPrivacyCard, setShowPrivacyCard] = useState(false);
   const { t } = useTranslation();
   const { showInvestments } = useSettings();
 
@@ -98,13 +99,14 @@ export default function DashboardScreen(): JSX.Element {
       const wallets = await listWallets(true);
       setWalletsCount(wallets.length);
 
-      const [snapshots, incomeEntries, expenseEntries, expenseCategories, pref, profile] = await Promise.all([
+      const [snapshots, incomeEntries, expenseEntries, expenseCategories, pref, profile, privacyPref] = await Promise.all([
         listSnapshots(),
         listIncomeEntries(),
         listExpenseEntries(),
         listExpenseCategories(),
         getPreference("chart_points"),
         getPreference("profile_name"),
+        getPreference("privacy_tooltip_dismissed"),
       ]);
 
       const latestSnapshot = await getLatestSnapshot();
@@ -138,6 +140,7 @@ export default function DashboardScreen(): JSX.Element {
 
       const ask = await getPreference("ask_snapshot_on_start");
       setProfileName(profile?.value?.trim() ?? "");
+      setShowPrivacyCard(privacyPref?.value !== "true");
       if (!prompted && ask?.value === "true") {
         const today = todayIso();
         if (!latestSnapshot || latestSnapshot.date !== today) {
@@ -194,11 +197,29 @@ export default function DashboardScreen(): JSX.Element {
       .finally(() => setLoading(false));
   }, [load]);
 
+  useFocusEffect(
+    useCallback(() => {
+      load();
+      return undefined;
+    }, [load])
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await load();
     setRefreshing(false);
   }, [load]);
+
+  const dismissPrivacyCard = useCallback(() => {
+    setShowPrivacyCard(false);
+    setPreference("privacy_tooltip_dismissed", "true").catch(() => {});
+  }, []);
+
+  const handlePrivacyLearnMore = useCallback(() => {
+    Alert.alert(t("dashboard.privacy.title"), t("dashboard.privacy.body"), [
+      { text: t("common.close") },
+    ]);
+  }, [t]);
 
   const emptyState = walletsCount === 0 && !loading;
 
@@ -245,20 +266,55 @@ export default function DashboardScreen(): JSX.Element {
         {dashboard ? (
           <>
             <View style={styles.greetingBlock}>
-            <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
-              {profileName
-                ? t("dashboard.greetingWithName", { name: profileName })
-                : t("dashboard.greeting")}
-            </Text>
+              <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
+                {profileName
+                  ? t("dashboard.greetingWithName", { name: profileName })
+                  : t("dashboard.greeting")}
+              </Text>
               <KPIStrip items={dashboard.kpis} />
             </View>
+            {showPrivacyCard && (
+              <GlassCardContainer>
+                <View style={styles.privacyHeader}>
+                  <MaterialCommunityIcons name="shield-lock-outline" size={20} color={tokens.colors.accent} />
+                  <View style={styles.privacyText}>
+                    <Text style={[styles.privacyTitle, { color: tokens.colors.text }]}>
+                      {t("dashboard.privacy.title")}
+                    </Text>
+                    <Text
+                      style={[styles.privacyBody, { color: tokens.colors.muted }]}
+                      numberOfLines={2}
+                    >
+                      {t("dashboard.privacy.body")}
+                    </Text>
+                  </View>
+                </View>
+                <View style={styles.privacyActions}>
+                  <PressScale onPress={handlePrivacyLearnMore} style={styles.privacyLink}>
+                    <Text style={[styles.privacyLinkText, { color: tokens.colors.accent }]}>
+                      {t("dashboard.privacy.learnMore")}
+                    </Text>
+                  </PressScale>
+                  <PressScale onPress={dismissPrivacyCard}>
+                    <Text style={[styles.privacyDismiss, { color: tokens.colors.text }]}>
+                      {t("dashboard.privacy.dismiss")}
+                    </Text>
+                  </PressScale>
+                </View>
+              </GlassCardContainer>
+            )}
 
             <SectionAccordion
               title={t("dashboard.section.trend")}
               open={sectionStates.andamento}
               onToggle={() => handleToggleSection("andamento")}
             >
-              <PortfolioLineChartCard data={dashboard.portfolioSeries} hideHeader noCard />
+              <PortfolioLineChartCard
+                data={dashboard.portfolioSeries}
+                hideHeader
+                noCard
+                modes={showInvestments ? undefined : ["total"]}
+              />
             </SectionAccordion>
 
             <SectionAccordion
@@ -322,13 +378,49 @@ const styles = StyleSheet.create({
   greetingBlock: {
     gap: 10,
   },
+  privacyHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 10,
+  },
+  privacyText: {
+    flex: 1,
+    gap: 4,
+  },
+  privacyTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  privacyBody: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "500",
+  },
+  privacyActions: {
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  privacyLink: {
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  privacyLinkText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  privacyDismiss: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
 
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
   },
   accordionTitle: {
     fontSize: 16,
@@ -342,9 +434,9 @@ const styles = StyleSheet.create({
   },
   accordionContent: {
     marginTop: 8,
-    gap: 16,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    gap: 12,
+    paddingHorizontal: 0,
+    paddingBottom: 0,
   },
   greetingText: {
     fontSize: 34,

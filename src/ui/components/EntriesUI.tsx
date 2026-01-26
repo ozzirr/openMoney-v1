@@ -99,13 +99,25 @@ export function PrimaryPillButton({
   label,
   onPress,
   color,
+  disabled = false,
 }: {
   label: string;
   onPress: () => void;
   color: string;
+  disabled?: boolean;
 }): JSX.Element {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.primaryPill, { backgroundColor: color, opacity: pressed ? 0.92 : 1 }]}>
+    <Pressable
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
+      style={({ pressed }) => [
+        styles.primaryPill,
+        {
+          backgroundColor: color,
+          opacity: disabled ? 0.6 : pressed ? 0.92 : 1,
+        },
+      ]}
+    >
       <Text style={styles.primaryPillText}>{label}</Text>
     </Pressable>
   );
@@ -115,10 +127,12 @@ export function SmallOutlinePillButton({
   label,
   onPress,
   color,
+  icon,
 }: {
   label: string;
   onPress: () => void;
   color: string;
+  icon?: React.ReactNode;
 }): JSX.Element {
   return (
     <Pressable
@@ -128,6 +142,7 @@ export function SmallOutlinePillButton({
         { borderColor: color, opacity: pressed ? 0.85 : 1 },
       ]}
     >
+      {icon ? <View style={styles.smallOutlineIcon}>{icon}</View> : null}
       <Text style={[styles.smallOutlineText, { color }]}>{label}</Text>
     </Pressable>
   );
@@ -169,7 +184,7 @@ export function DatePill({ day, month }: { day: string; month: string }): JSX.El
   const { tokens } = useDashboardTheme();
   return (
     <View style={[styles.datePill, { borderColor: tokens.colors.glassBorder, backgroundColor: tokens.colors.glassBg }]}>
-      <Text style={styles.dateDay}>{day}</Text>
+      <Text style={[styles.dateDay, { color: tokens.colors.text }]}>{day}</Text>
       <Text style={[styles.dateMonth, { color: tokens.colors.muted }]}>{month}</Text>
     </View>
   );
@@ -220,6 +235,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     minWidth: 72,
     alignItems: "center",
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+  },
+  smallOutlineIcon: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   chip: {
     paddingHorizontal: 12,
@@ -247,7 +269,6 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   dateDay: {
-    color: "#FFFFFF",
     fontWeight: "800",
     fontSize: 16,
   },

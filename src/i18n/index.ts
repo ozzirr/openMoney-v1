@@ -48,7 +48,7 @@ export function initI18n(): Promise<void> {
         lng: finalLanguage,
         fallbackLng: "it",
         supportedLngs: [...SUPPORTED_LANGUAGES],
-        debug: __DEV__,
+        debug: false,
         interpolation: {
           escapeValue: false,
         },

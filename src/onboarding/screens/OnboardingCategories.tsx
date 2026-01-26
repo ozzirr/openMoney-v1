@@ -7,14 +7,12 @@ import { useNavigation } from "@react-navigation/native";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { OnboardingStackParamList } from "@/onboarding/OnboardingNavigator";
 import { useOnboardingDraft, defaultCategories } from "@/onboarding/state/OnboardingContext";
-import { useTranslation } from "react-i18next";
 
 export default function OnboardingCategories(): JSX.Element {
   const { tokens } = useDashboardTheme();
   const navigation =
     useNavigation<NativeStackNavigationProp<OnboardingStackParamList, "OnboardingCategories">>();
   const { draft, toggleCategory, addCustomCategory } = useOnboardingDraft();
-  const { t } = useTranslation();
   const [newCategory, setNewCategory] = useState("");
 
   const selectedCategories = useMemo(() => new Set(draft.categories), [draft.categories]);
@@ -53,34 +51,26 @@ export default function OnboardingCategories(): JSX.Element {
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: tokens.colors.bg }]}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={[styles.title, { color: tokens.colors.text }]}>
-          {t("onboarding.categories.title")}
-        </Text>
+        <Text style={[styles.title, { color: tokens.colors.text }]}>Categorie</Text>
         <Text style={[styles.subtitle, { color: tokens.colors.muted }]}>
-          {t("onboarding.categories.subtitle")}
+          Seleziona le categorie che utilizzerai fin da subito.
         </Text>
         <View style={[styles.card, { backgroundColor: tokens.colors.surface }]}>
-          <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>
-            {t("onboarding.categories.defaultTitle")}
-          </Text>
+          <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>Categorie predefinite</Text>
           {defaultCategories.map((category) => renderCheckbox(category))}
         </View>
 
         {customCategories.length > 0 && (
           <View style={[styles.card, { backgroundColor: tokens.colors.surface }]}>
-            <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>
-              {t("onboarding.categories.addedTitle")}
-            </Text>
+            <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>Categorie aggiunte</Text>
             {customCategories.map((category) => renderCheckbox(category))}
           </View>
         )}
 
         <View style={[styles.card, { backgroundColor: tokens.colors.surface }]}>
-          <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>
-            {t("onboarding.categories.addLabel")}
-          </Text>
+          <Text style={[styles.sectionLabel, { color: tokens.colors.text }]}>Aggiungi categoria</Text>
           <TextInput
-            label={t("onboarding.categories.categoryNameLabel")}
+            label="Nome categoria"
             value={newCategory}
             mode="flat"
             onChangeText={setNewCategory}
@@ -94,7 +84,7 @@ export default function OnboardingCategories(): JSX.Element {
             disabled={!newCategory.trim()}
             style={styles.addButton}
           >
-            {t("onboarding.categories.addButton")}
+            Aggiungi
           </Button>
         </View>
       </ScrollView>
@@ -105,7 +95,7 @@ export default function OnboardingCategories(): JSX.Element {
           onPress={handleContinue}
           disabled={!canContinue}
         >
-          {t("common.continue")}
+          Continua
         </Button>
       </View>
     </SafeAreaView>

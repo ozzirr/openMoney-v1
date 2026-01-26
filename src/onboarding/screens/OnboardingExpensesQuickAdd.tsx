@@ -7,7 +7,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { OnboardingStackParamList } from "@/onboarding/OnboardingNavigator";
 import { useOnboardingDraft, OnboardingExpenseForm } from "@/onboarding/state/OnboardingContext";
-import { useTranslation } from "react-i18next";
 
 const formatToday = () => new Date().toISOString().split("T")[0];
 
@@ -34,7 +33,6 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
   const navigation =
     useNavigation<NativeStackNavigationProp<OnboardingStackParamList, "OnboardingExpensesQuickAdd">>();
   const { draft, addExpense, updateExpense } = useOnboardingDraft();
-  const { t } = useTranslation();
 
   const validExpenses = useMemo(() => draft.expenses.filter(expenseIsValid), [draft.expenses]);
   const canContinue = validExpenses.length >= 2;
@@ -49,13 +47,9 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
   const renderExpense = (expense: OnboardingExpenseForm, index: number) => (
     <View key={expense.id} style={[styles.expenseCard, { backgroundColor: tokens.colors.surface }]}>
       <View style={styles.expenseHeader}>
-        <Text style={[styles.expenseTitle, { color: tokens.colors.text }]}>
-          {t("onboarding.expenses.expenseTitle", { index: index + 1 })}
-        </Text>
+        <Text style={[styles.expenseTitle, { color: tokens.colors.text }]}>Spesa {index + 1}</Text>
         <View style={styles.recurringRow}>
-          <Text style={[styles.recurringLabel, { color: tokens.colors.text }]}>
-            {t("onboarding.expenses.recurringLabel")}
-          </Text>
+          <Text style={[styles.recurringLabel, { color: tokens.colors.text }]}>Ricorrente</Text>
           <Switch
             value={expense.recurring}
             onValueChange={(value) => {
@@ -68,7 +62,7 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
         </View>
       </View>
       <TextInput
-        label={t("onboarding.expenses.titleLabel")}
+        label="Titolo"
         value={expense.title}
         onChangeText={(text) => updateExpense(expense.id, { title: text })}
         mode="flat"
@@ -76,7 +70,7 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
         textColor={tokens.colors.text}
       />
       <TextInput
-        label={t("onboarding.expenses.amountLabel")}
+        label="Importo"
         value={expense.amount}
         onChangeText={(text) => updateExpense(expense.id, { amount: text })}
         keyboardType="numeric"
@@ -85,7 +79,7 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
         textColor={tokens.colors.text}
       />
       <TextInput
-        label={t("onboarding.expenses.categoryLabel")}
+        label="Categoria"
         value={expense.category}
         onChangeText={(text) => updateExpense(expense.id, { category: text })}
         mode="flat"
@@ -93,7 +87,7 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
         textColor={tokens.colors.text}
       />
       <TextInput
-        label={t("onboarding.expenses.walletLabel")}
+        label="Wallet"
         value={expense.wallet}
         onChangeText={(text) => updateExpense(expense.id, { wallet: text })}
         mode="flat"
@@ -101,17 +95,17 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
         textColor={tokens.colors.text}
       />
       <TextInput
-        label={t("onboarding.expenses.dateLabel")}
+        label="Data"
         value={expense.date}
         onChangeText={(text) => updateExpense(expense.id, { date: text })}
         mode="flat"
         style={styles.input}
         textColor={tokens.colors.text}
       />
-        {expense.recurring && (
-          <TextInput
-            label={t("onboarding.expenses.nextDateLabel")}
-            value={expense.nextDate}
+      {expense.recurring && (
+        <TextInput
+          label="Prossima data"
+          value={expense.nextDate}
           onChangeText={(text) => updateExpense(expense.id, { nextDate: text })}
           mode="flat"
           style={styles.input}
@@ -124,12 +118,12 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: tokens.colors.bg }]}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={[styles.title, { color: tokens.colors.text }]}>{t("onboarding.expenses.title")}</Text>
+        <Text style={[styles.title, { color: tokens.colors.text }]}>Aggiungi le tue spese</Text>
         <Text style={[styles.subtitle, { color: tokens.colors.muted }]}>
-          {t("onboarding.expenses.subtitle")}
+          Inserisci almeno due uscite per tenere traccia delle spese iniziali.
         </Text>
         <Text style={[styles.counter, { color: tokens.colors.accent }]}>
-          {t("onboarding.expenses.counter", { count: validExpenses.length })}
+          {validExpenses.length}/3 (consigliate)
         </Text>
         {draft.expenses.map(renderExpense)}
         <Button
@@ -138,17 +132,12 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
           onPress={addExpense}
           style={styles.addButton}
         >
-          {t("onboarding.expenses.addAnother")}
+          Aggiungi un'altra spesa
         </Button>
       </ScrollView>
       <View style={styles.footer}>
-        <Button
-          mode="contained"
-          buttonColor={tokens.colors.accent}
-          onPress={handleContinue}
-          disabled={!canContinue}
-        >
-          {t("common.continue")}
+        <Button mode="contained" buttonColor={tokens.colors.accent} onPress={handleContinue} disabled={!canContinue}>
+          Continua
         </Button>
       </View>
     </SafeAreaView>

@@ -1,7 +1,48 @@
-import type { OnboardingDraft } from "@/onboarding/state/OnboardingContext";
 import { withTransaction } from "@/db/db";
+import { createWallet, listWallets } from "@/repositories/walletsRepo";
+import { createExpenseCategory, listExpenseCategories } from "@/repositories/expenseCategoriesRepo";
+import { getInitialSeedDone, setInitialSeedDone } from "@/onboarding/onboardingStorage";
 
 const CATEGORY_COLOR = "#9B7BFF";
+const DEFAULT_CATEGORIES = ["Casa", "Spesa", "Trasporti", "Svago", "Salute", "Abbonamenti"];
+
+type WalletForm = {
+  name: string;
+  balance: string;
+};
+
+type InvestmentWalletForm = WalletForm & {
+  id: string;
+};
+
+type RecurringIncomeForm = {
+  name: string;
+  amount: string;
+  frequency: "monthly";
+  nextDate: string;
+  walletName: string;
+};
+
+type OnboardingExpenseForm = {
+  id: string;
+  title: string;
+  amount: string;
+  category: string;
+  wallet: string;
+  date: string;
+  recurring: boolean;
+  nextDate: string;
+};
+
+type OnboardingDraft = {
+  liquidityWallet: WalletForm;
+  hasInvestments: boolean;
+  investmentWallets: InvestmentWalletForm[];
+  categories: string[];
+  customCategories: string[];
+  recurringIncome: RecurringIncomeForm;
+  expenses: OnboardingExpenseForm[];
+};
 
 function parseNumber(value: string): number | null {
   const normalized = value.replace(",", ".").trim();
@@ -110,4 +151,30 @@ export async function seedOnboardingData(draft: OnboardingDraft): Promise<void> 
       );
     }
   });
+}
+
+export async function seedInitialData({ hasInvestments }: { hasInvestments: boolean }): Promise<void> {
+  const alreadySeeded = await getInitialSeedDone();
+  if (alreadySeeded) return;
+
+  try {
+    const wallets = await listWallets();
+    if (wallets.length === 0) {
+      await createWallet("Liquidità", "LIQUIDITY", "EUR", "Liquidità", 1);
+      if (hasInvestments) {
+        await createWallet("Investimenti", "INVEST", "EUR", "Investimenti", 1);
+      }
+    }
+
+    const categories = await listExpenseCategories();
+    if (categories.length === 0) {
+      for (const name of DEFAULT_CATEGORIES) {
+        await createExpenseCategory(name, CATEGORY_COLOR);
+      }
+    }
+
+    await setInitialSeedDone(true);
+  } catch (error) {
+    console.warn("Failed to seed initial data:", error);
+  }
 }

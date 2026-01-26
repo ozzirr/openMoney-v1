@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { RefreshControl, ScrollView, StyleSheet, View } from "react-native";
-import { List, Snackbar, Text, TextInput } from "react-native-paper";
+import { Snackbar, Text, TextInput, List } from "react-native-paper";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import PressScale from "@/ui/dashboard/components/PressScale";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
@@ -21,6 +21,7 @@ import { useTranslation } from "react-i18next";
 import { useSettings } from "@/settings/useSettings";
 import LimitReachedModal from "@/ui/components/LimitReachedModal";
 import AppBackground from "@/ui/components/AppBackground";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   GlassCardContainer,
   PrimaryPillButton,
@@ -53,6 +54,59 @@ function nextPresetColor(current: string): string {
   return presetColors[(index + 1) % presetColors.length];
 }
 
+type AccordionItemProps = {
+  title: string;
+  subtitle?: string;
+  icon: string;
+  expanded: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+};
+
+const AccordionItem = ({ title, subtitle, icon, expanded, onToggle, children }: AccordionItemProps) => {
+  const { tokens } = useDashboardTheme();
+  return (
+    <GlassCardContainer contentStyle={{ gap: 12, padding: 12 }}>
+      <PressScale onPress={onToggle} style={[styles.walletRow, { paddingVertical: 6 }]}>
+        <View
+          style={[
+            styles.walletIconBadge,
+            { borderColor: tokens.colors.glassBorder, backgroundColor: tokens.colors.glassBg },
+          ]}
+        >
+          <MaterialCommunityIcons name={icon} size={18} color={tokens.colors.muted} />
+        </View>
+        <View style={styles.walletText}>
+          <Text style={[styles.walletTitle, { color: tokens.colors.text }]} numberOfLines={1} ellipsizeMode="tail">
+            {title}
+          </Text>
+          {subtitle ? (
+            <Text style={[styles.walletSubtitle, { color: tokens.colors.muted }]} numberOfLines={1} ellipsizeMode="tail">
+              {subtitle}
+            </Text>
+          ) : null}
+        </View>
+        <MaterialCommunityIcons
+          name="chevron-down"
+          size={20}
+          color={tokens.colors.muted}
+          style={{ transform: [{ rotate: expanded ? "180deg" : "0deg" }] }}
+        />
+      </PressScale>
+      {expanded ? (
+        <View
+          style={[
+            styles.accordionBody,
+            { backgroundColor: tokens.colors.glassBg, borderColor: tokens.colors.glassBorder },
+          ]}
+        >
+          {children}
+        </View>
+      ) : null}
+    </GlassCardContainer>
+  );
+};
+
 export default function WalletScreen(): JSX.Element {
   const { tokens } = useDashboardTheme();
   const insets = useSafeAreaInsets();
@@ -65,6 +119,7 @@ export default function WalletScreen(): JSX.Element {
   const [categoryEdits, setCategoryEdits] = useState<Record<number, CategoryEdit>>({});
   const [newCategory, setNewCategory] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState(presetColors[0]);
+  const [showAddCategory, setShowAddCategory] = useState(false);
   const [expandedCategoryId, setExpandedCategoryId] = useState<number | null>(null);
   const [tab, setTab] = useState<"LIQUIDITY" | "INVEST">("LIQUIDITY");
   const [newWalletDraft, setNewWalletDraft] = useState<{ name: string; tag: string; currency: Currency }>({
@@ -213,7 +268,7 @@ export default function WalletScreen(): JSX.Element {
     outlineColor: tokens.colors.border,
     activeOutlineColor: tokens.colors.accent,
     textColor: tokens.colors.text,
-    style: { backgroundColor: tokens.colors.surface2 },
+    style: { backgroundColor: tokens.colors.glassBg },
   };
 
   return (
@@ -276,76 +331,76 @@ export default function WalletScreen(): JSX.Element {
                   </GlassCardContainer>
                 )}
 
-                {liquidityWallets.map((wallet) => (
-                  <List.Accordion
-                    key={wallet.id}
-                    title={walletEdits[wallet.id]?.name ?? wallet.name}
-                    description={`${walletEdits[wallet.id]?.currency ?? wallet.currency}`}
-                    left={(props) => <List.Icon {...props} icon="wallet" />}
-                    style={{ marginTop: 8, backgroundColor: tokens.colors.surface2 }}
-                    titleStyle={{ color: tokens.colors.text }}
-                    descriptionStyle={{ color: tokens.colors.muted }}
-                    expanded={expandedWalletId === wallet.id}
-                    onPress={() => setExpandedWalletId((prev) => (prev === wallet.id ? null : wallet.id))}
-                  >
-                    <View style={styles.sectionContent}>
-                      <TextInput
-                        label={t("wallets.form.name")}
-                        value={walletEdits[wallet.id]?.name ?? wallet.name}
-                        {...inputProps}
-                        onChangeText={(value) =>
-                          setWalletEdits((prev) => ({
-                            ...prev,
-                            [wallet.id]: { ...prev[wallet.id], name: value },
-                          }))
-                        }
-                      />
-                      <SegmentedControlPill
-                        value={walletEdits[wallet.id]?.currency ?? wallet.currency}
-                        onChange={(value) =>
-                          setWalletEdits((prev) => ({
-                            ...prev,
-                            [wallet.id]: { ...prev[wallet.id], currency: value as Currency },
-                          }))
-                        }
-                        options={[
-                          { value: "EUR", label: "EUR" },
-                          { value: "USD", label: "USD" },
-                          { value: "GBP", label: "GBP" },
-                        ]}
-                      />
-                      <View style={styles.actionsRow}>
-                        <PrimaryPillButton
-                          label={t("common.save")}
-                          onPress={async () => {
-                            const edit = walletEdits[wallet.id];
-                            if (!edit) return;
-                            setExpandedWalletId(null);
-                            await updateWallet(
-                              wallet.id,
-                              edit.name,
-                              wallet.type,
-                              edit.currency,
-                              null,
-                              wallet.active
-                            );
-                            await load();
-                          }}
-                          color={tokens.colors.accent}
+                {liquidityWallets.map((wallet) => {
+                  const subtitle = `${walletEdits[wallet.id]?.currency ?? wallet.currency}${wallet.tag ? ` · ${wallet.tag}` : ""}`;
+                  return (
+                    <AccordionItem
+                      key={wallet.id}
+                      title={walletEdits[wallet.id]?.name ?? wallet.name}
+                      subtitle={subtitle}
+                      icon="wallet"
+                      expanded={expandedWalletId === wallet.id}
+                      onToggle={() => setExpandedWalletId((prev) => (prev === wallet.id ? null : wallet.id))}
+                    >
+                      <View style={[styles.sectionContent, styles.accordionInner]}>
+                        <TextInput
+                          label={t("wallets.form.name")}
+                          value={walletEdits[wallet.id]?.name ?? wallet.name}
+                          {...inputProps}
+                          onChangeText={(value) =>
+                            setWalletEdits((prev) => ({
+                              ...prev,
+                              [wallet.id]: { ...prev[wallet.id], name: value },
+                            }))
+                          }
                         />
-                        <SmallOutlinePillButton
-                          label={t("common.delete")}
-                          onPress={async () => {
-                            await deleteWallet(wallet.id);
-                            await load();
-                            setExpandedWalletId(null);
-                          }}
-                          color={tokens.colors.red}
+                        <SegmentedControlPill
+                          value={walletEdits[wallet.id]?.currency ?? wallet.currency}
+                          onChange={(value) =>
+                            setWalletEdits((prev) => ({
+                              ...prev,
+                              [wallet.id]: { ...prev[wallet.id], currency: value as Currency },
+                            }))
+                          }
+                          options={[
+                            { value: "EUR", label: "EUR" },
+                            { value: "USD", label: "USD" },
+                            { value: "GBP", label: "GBP" },
+                          ]}
                         />
+                        <View style={styles.actionsRow}>
+                          <PrimaryPillButton
+                            label={t("common.save")}
+                            onPress={async () => {
+                              const edit = walletEdits[wallet.id];
+                              if (!edit) return;
+                              setExpandedWalletId(null);
+                              await updateWallet(
+                                wallet.id,
+                                edit.name,
+                                wallet.type,
+                                edit.currency,
+                                null,
+                                wallet.active
+                              );
+                              await load();
+                            }}
+                            color={tokens.colors.accent}
+                          />
+                          <SmallOutlinePillButton
+                            label={t("common.delete")}
+                            onPress={async () => {
+                              await deleteWallet(wallet.id);
+                              await load();
+                              setExpandedWalletId(null);
+                            }}
+                            color={tokens.colors.red}
+                          />
+                        </View>
                       </View>
-                    </View>
-                  </List.Accordion>
-                ))}
+                    </AccordionItem>
+                  );
+                })}
               </>
             )}
 
@@ -391,21 +446,20 @@ export default function WalletScreen(): JSX.Element {
                   </GlassCardContainer>
                 )}
 
-                {investmentWallets.map((wallet) => (
-                  <List.Accordion
-                    key={wallet.id}
-                    title={walletEdits[wallet.id]?.name ?? wallet.name}
-                    description={`${walletEdits[wallet.id]?.currency ?? wallet.currency}${
-                      walletEdits[wallet.id]?.tag || wallet.tag ? ` • ${walletEdits[wallet.id]?.tag ?? wallet.tag}` : ""
-                    }`}
-                    left={(props) => <List.Icon {...props} icon="wallet" />}
-                    style={{ marginTop: 8, backgroundColor: tokens.colors.surface2 }}
-                    titleStyle={{ color: tokens.colors.text }}
-                    descriptionStyle={{ color: tokens.colors.muted }}
-                    expanded={expandedWalletId === wallet.id}
-                    onPress={() => setExpandedWalletId((prev) => (prev === wallet.id ? null : wallet.id))}
-                  >
-                    <View style={styles.sectionContent}>
+                {investmentWallets.map((wallet) => {
+                  const subtitle = `${walletEdits[wallet.id]?.currency ?? wallet.currency}${
+                    walletEdits[wallet.id]?.tag || wallet.tag ? ` · ${walletEdits[wallet.id]?.tag ?? wallet.tag}` : ""
+                  }`;
+                  return (
+                    <AccordionItem
+                      key={wallet.id}
+                      title={walletEdits[wallet.id]?.name ?? wallet.name}
+                      subtitle={subtitle}
+                      icon="wallet"
+                      expanded={expandedWalletId === wallet.id}
+                      onToggle={() => setExpandedWalletId((prev) => (prev === wallet.id ? null : wallet.id))}
+                    >
+                    <View style={[styles.sectionContent, styles.accordionInner]}>
                       <TextInput
                         label={t("wallets.form.brokerLabel")}
                         value={walletEdits[wallet.id]?.name ?? wallet.name}
@@ -472,87 +526,109 @@ export default function WalletScreen(): JSX.Element {
                         />
                       </View>
                     </View>
-                  </List.Accordion>
-                ))}
+                    </AccordionItem>
+                  );
+                })}
               </>
             )}
           </View>
         </GlassCardContainer>
 
-        <GlassCardContainer>
+        <GlassCardContainer contentStyle={{ gap: 12, padding: 12 }}>
           <SectionHeader title={t("wallets.list.categoriesTitle")} />
-          <View style={styles.sectionContent}>
-            <View style={styles.colorLine}>
-              <TextInput
-                label={t("wallets.list.newCategoryLabel")}
-                value={newCategory}
-                {...inputProps}
-                style={[styles.categoryNameInput, inputProps.style]}
-                onChangeText={setNewCategory}
-              />
-              <PressScale
-                onPress={() => setNewCategoryColor((prev) => nextPresetColor(prev))}
-                style={[
-                  styles.colorSwatch,
-                  { backgroundColor: newCategoryColor, borderColor: tokens.colors.text },
-                ]}
-              />
+          {!showAddCategory && (
+            <PrimaryPillButton
+              label={t("wallets.list.addCategory", { defaultValue: t("common.add") })}
+              onPress={() => setShowAddCategory(true)}
+              color={tokens.colors.accent}
+            />
+          )}
+          {showAddCategory && (
+            <View style={{ gap: 10 }}>
+              <View style={[styles.colorLine, { paddingVertical: 2 }]}>
+                <TextInput
+                  label={t("wallets.list.newCategoryLabel")}
+                  value={newCategory}
+                  {...inputProps}
+                  style={[styles.categoryNameInput, { backgroundColor: tokens.colors.glassBg }]}
+                  onChangeText={setNewCategory}
+                />
+                <PressScale
+                  onPress={() => setNewCategoryColor((prev) => nextPresetColor(prev))}
+                  style={[
+                    styles.colorSwatch,
+                    { backgroundColor: newCategoryColor, borderColor: tokens.colors.glassBorder },
+                  ]}
+                />
+              </View>
+              <View style={styles.actionsRow}>
+                <PrimaryPillButton label={t("common.add")} onPress={addCategory} color={tokens.colors.accent} />
+                <SmallOutlinePillButton
+                  label={t("common.cancel")}
+                  onPress={() => {
+                    setShowAddCategory(false);
+                    setNewCategory("");
+                    setNewCategoryColor(presetColors[0]);
+                  }}
+                  color={tokens.colors.text}
+                />
+              </View>
             </View>
-            <PrimaryPillButton label={t("common.add")} onPress={addCategory} color={tokens.colors.accent} />
-            {categories.length === 0 ? (
-              <Text style={{ color: tokens.colors.muted }}>{t("wallets.list.noCategories")}</Text>
-            ) : null}
-            {categories.map((cat) => (
-              <List.Accordion
-                key={cat.id}
-                title={categoryEdits[cat.id]?.name ?? cat.name}
-                description={t("wallets.list.categoryActive")}
-                left={(props) => <List.Icon {...props} icon="tag" />}
-                style={{ marginTop: 8, backgroundColor: tokens.colors.surface2 }}
-                titleStyle={{ color: tokens.colors.text }}
-                descriptionStyle={{ color: tokens.colors.muted }}
-                expanded={expandedCategoryId === cat.id}
-                onPress={() => setExpandedCategoryId((prev) => (prev === cat.id ? null : cat.id))}
-              >
-                <View style={styles.sectionContent}>
-                  <View style={styles.colorLine}>
-                    <TextInput
-                      label="Nome categoria"
-                      value={categoryEdits[cat.id]?.name ?? cat.name}
-                      {...inputProps}
-                      style={[styles.categoryNameInput, { backgroundColor: tokens.colors.surface }]}
-                      onChangeText={(value) =>
-                        setCategoryEdits((prev) => ({
-                          ...prev,
-                          [cat.id]: {
-                            name: value,
-                            color: prev[cat.id]?.color ?? cat.color,
-                          },
-                        }))
-                      }
-                    />
-                    <PressScale
-                      onPress={() =>
-                        setCategoryEdits((prev) => {
-                          const current = prev[cat.id]?.color ?? cat.color;
-                          return {
+          )}
+          {categories.length === 0 ? (
+            <Text style={{ color: tokens.colors.muted }}>{t("wallets.list.noCategories")}</Text>
+          ) : null}
+          <View style={{ gap: 10 }}>
+            {categories.map((cat) => {
+              const subtitle = t("wallets.list.categoryActive");
+              return (
+                <AccordionItem
+                  key={cat.id}
+                  title={categoryEdits[cat.id]?.name ?? cat.name}
+                  subtitle={subtitle}
+                  icon="tag"
+                  expanded={expandedCategoryId === cat.id}
+                  onToggle={() => setExpandedCategoryId((prev) => (prev === cat.id ? null : cat.id))}
+                >
+                  <View style={[styles.sectionContent, styles.accordionInner]}>
+                    <View style={[styles.colorLine, { paddingVertical: 0 }]}>
+                      <TextInput
+                        label="Nome categoria"
+                        value={categoryEdits[cat.id]?.name ?? cat.name}
+                        {...inputProps}
+                        style={[styles.categoryNameInput, { backgroundColor: tokens.colors.glassBg }]}
+                        onChangeText={(value) =>
+                          setCategoryEdits((prev) => ({
                             ...prev,
                             [cat.id]: {
-                              name: prev[cat.id]?.name ?? cat.name,
-                              color: nextPresetColor(current),
+                              name: value,
+                              color: prev[cat.id]?.color ?? cat.color,
                             },
-                          };
-                        })
-                      }
-                      style={[
-                        styles.colorSwatch,
-                        {
-                          backgroundColor: categoryEdits[cat.id]?.color ?? cat.color,
-                          borderColor: tokens.colors.text,
-                        },
-                      ]}
-                    />
-                  </View>
+                          }))
+                        }
+                      />
+                      <PressScale
+                        onPress={() =>
+                          setCategoryEdits((prev) => {
+                            const current = prev[cat.id]?.color ?? cat.color;
+                            return {
+                              ...prev,
+                              [cat.id]: {
+                                name: prev[cat.id]?.name ?? cat.name,
+                                color: nextPresetColor(current),
+                              },
+                            };
+                          })
+                        }
+                        style={[
+                          styles.colorSwatch,
+                          {
+                            backgroundColor: categoryEdits[cat.id]?.color ?? cat.color,
+                            borderColor: tokens.colors.glassBorder,
+                          },
+                        ]}
+                      />
+                    </View>
                     <View style={styles.actionsRow}>
                       <PrimaryPillButton label={t("common.save")} onPress={async () => { await saveCategory(cat.id); }} color={tokens.colors.accent} />
                       <SmallOutlinePillButton
@@ -564,9 +640,10 @@ export default function WalletScreen(): JSX.Element {
                         color={tokens.colors.red}
                       />
                     </View>
-                </View>
-              </List.Accordion>
-            ))}
+                  </View>
+                </AccordionItem>
+              );
+            })}
           </View>
         </GlassCardContainer>
 
@@ -616,5 +693,40 @@ const styles = StyleSheet.create({
     height: 26,
     borderRadius: 13,
     borderWidth: 2,
+  },
+  walletRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  walletIconBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  walletText: {
+    flex: 1,
+    minWidth: 0,
+    gap: 2,
+  },
+  walletTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  walletSubtitle: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  accordionBody: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 12,
+    gap: 12,
+  },
+  accordionInner: {
+    gap: 12,
   },
 });

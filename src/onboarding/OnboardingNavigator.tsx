@@ -1,20 +1,13 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import OnboardingIntro from "./screens/OnboardingIntro";
-import OnboardingWallets from "./screens/OnboardingWallets";
-import OnboardingCategories from "./screens/OnboardingCategories";
-import OnboardingIncomeRecurring from "./screens/OnboardingIncomeRecurring";
-import OnboardingExpensesQuickAdd from "./screens/OnboardingExpensesQuickAdd";
-import OnboardingDone from "./screens/OnboardingDone";
-import { OnboardingProvider } from "./state/OnboardingContext";
+import OnboardingWelcome from "./screens/OnboardingWelcome";
+import OnboardingName from "./screens/OnboardingName";
+import OnboardingInvestments from "./screens/OnboardingInvestments";
 
 export type OnboardingStackParamList = {
-  OnboardingIntro: undefined;
-  OnboardingWallets: undefined;
-  OnboardingCategories: undefined;
-  OnboardingIncomeRecurring: undefined;
-  OnboardingExpensesQuickAdd: undefined;
-  OnboardingDone: undefined;
+  OnboardingWelcome: undefined;
+  OnboardingName: undefined;
+  OnboardingInvestments: undefined;
 };
 
 type Props = {
@@ -29,31 +22,28 @@ export default function OnboardingNavigator({
   shouldSeedOnComplete = true,
 }: Props): JSX.Element {
   return (
-    <OnboardingProvider>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="OnboardingIntro">
-          {() => (
-            <OnboardingIntro onComplete={onComplete} shouldSeedOnComplete={shouldSeedOnComplete} />
-          )}
-        </Stack.Screen>
-        <Stack.Screen name="OnboardingWallets">
-          {() => <OnboardingWallets />}
-        </Stack.Screen>
-        <Stack.Screen name="OnboardingCategories">
-          {() => <OnboardingCategories />}
-        </Stack.Screen>
-        <Stack.Screen name="OnboardingIncomeRecurring">
-          {() => <OnboardingIncomeRecurring />}
-        </Stack.Screen>
-        <Stack.Screen name="OnboardingExpensesQuickAdd">
-          {() => <OnboardingExpensesQuickAdd />}
-        </Stack.Screen>
-        <Stack.Screen name="OnboardingDone">
-          {() => (
-            <OnboardingDone onComplete={onComplete} shouldSeedOnComplete={shouldSeedOnComplete} />
-          )}
-        </Stack.Screen>
-      </Stack.Navigator>
-    </OnboardingProvider>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="OnboardingWelcome">
+        {({ navigation }) => (
+          <OnboardingWelcome onNext={() => navigation.navigate("OnboardingName")} onSkip={onComplete} />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="OnboardingName">
+        {({ navigation }) => (
+          <OnboardingName
+            onNext={() => navigation.navigate("OnboardingInvestments")}
+            onSkip={onComplete}
+          />
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="OnboardingInvestments">
+        {() => (
+          <OnboardingInvestments
+            onFinish={onComplete}
+            shouldSeedOnComplete={shouldSeedOnComplete}
+          />
+        )}
+      </Stack.Screen>
+    </Stack.Navigator>
   );
 }

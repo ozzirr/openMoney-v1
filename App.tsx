@@ -22,7 +22,7 @@ import { DashboardThemeProvider } from "@/ui/dashboard/theme";
 import ProfileButton from "@/components/header/ProfileButton";
 import OnboardingNavigator from "@/onboarding/OnboardingNavigator";
 import { OnboardingFlowProvider } from "@/onboarding/flowContext";
-import { getOnboardingCompleted } from "@/onboarding/onboardingStorage";
+import { getOnboardingCompleted, setOnboardingCompleted } from "@/onboarding/onboardingStorage";
 import { StatusBar } from "expo-status-bar";
 import SecurityGate from "@/security/SecurityGate";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -83,6 +83,7 @@ export default function App(): JSX.Element {
 
   const handleOnboardingComplete = useCallback(() => {
     setManualOnboarding(false);
+    void setOnboardingCompleted(true);
     setOnboardingCompletedState(true);
   }, []);
 

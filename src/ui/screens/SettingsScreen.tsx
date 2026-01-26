@@ -11,6 +11,7 @@ import * as Clipboard from "expo-clipboard";
 import { exportToJson, importFromFile, importFromJson } from "@/importExport";
 import type { ExportPayload } from "@/importExport/types";
 import { runMigrations, withTransaction } from "@/db/db";
+import { emitDataReset } from "@/app/dataEvents";
 import { loadSampleData as seedSampleData } from "@/seed/sampleData";
 import { ensureDefaultWallets } from "@/repositories/walletsRepo";
 import { getPreference, setPreference } from "@/repositories/preferencesRepo";
@@ -250,6 +251,7 @@ export default function SettingsScreen(): JSX.Element {
       }
     });
     await ensureDefaultWallets();
+    emitDataReset();
   };
 
   const loadSampleDataHandler = useCallback(async () => {

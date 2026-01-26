@@ -132,9 +132,11 @@ function buildKpis(
     breakdown: netWorthBreakdown,
   };
 
-  const items: KPIItem[] = [liquidityItem];
+  const items: KPIItem[] = [];
   if (showInvestments) {
-    items.push(investItem, netWorthItem);
+    items.push(liquidityItem, investItem, netWorthItem);
+  } else {
+    items.push(netWorthItem);
   }
   return items;
 }
@@ -280,7 +282,9 @@ export function createMockDashboardData(showInvestments = true): DashboardData {
     { id: "investments", label: i18n.t("dashboard.mock.kpi.investments"), value: 32800, deltaValue: -620, deltaPct: -0.018 },
     { id: "netWorth", label: i18n.t("dashboard.mock.kpi.netWorth"), value: 49250, deltaValue: -200, deltaPct: -0.004 },
   ];
-  const kpis = showInvestments ? baseKpis : baseKpis.filter((item) => item.id === "liquidity");
+  const kpis = showInvestments
+    ? baseKpis
+    : baseKpis.filter((item) => item.id === "netWorth");
   const portfolioSeries: PortfolioPoint[] = [
     { date: "2024-11-01", total: 46800, liquidity: 15800, investments: 31000 },
     { date: "2024-12-01", total: 47200, liquidity: 16050, investments: 31150 },

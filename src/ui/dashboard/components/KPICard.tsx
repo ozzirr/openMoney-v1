@@ -10,9 +10,10 @@ import type { KPIItem } from "@/ui/dashboard/types";
 
 type Props = {
   item: KPIItem;
+  emphasizeValue?: boolean;
 };
 
-export default function KPICard({ item }: Props): JSX.Element {
+export default function KPICard({ item, emphasizeValue = false }: Props): JSX.Element {
   const { tokens } = useDashboardTheme();
   const [expanded, setExpanded] = useState(false);
   const [displayValue, setDisplayValue] = useState(item.value);
@@ -63,7 +64,15 @@ export default function KPICard({ item }: Props): JSX.Element {
           <Text style={[styles.label, { color: tokens.colors.muted }]}>{item.label}</Text>
           <MaterialCommunityIcons name={icon} size={16} color={item.accent ?? tokens.colors.accent} />
         </View>
-        <Text style={[styles.value, { color: tokens.colors.text }]}>{formatEUR(displayValue)}</Text>
+        <Text
+          style={[
+            styles.value,
+            { color: tokens.colors.text },
+            emphasizeValue ? styles.valueEmphasis : null,
+          ]}
+        >
+          {formatEUR(displayValue)}
+        </Text>
         <View style={styles.deltaRow}>
           <Text style={[styles.deltaValue, { color: deltaColor }]}>
             {deltaIsPositive ? "+" : ""}
@@ -110,6 +119,10 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: "700",
+  },
+  valueEmphasis: {
+    fontSize: 24,
+    fontWeight: "800",
   },
   deltaRow: {
     flexDirection: "row",

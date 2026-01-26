@@ -1,9 +1,8 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Alert, FlatList, StyleSheet, useWindowDimensions, View } from "react-native";
 import { Button } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useTranslation } from "react-i18next";
 
 import OnboardingSlide from "@/onboarding/components/OnboardingSlide";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
@@ -12,39 +11,39 @@ import { setOnboardingCompleted } from "@/onboarding/onboardingStorage";
 import type { SlideData } from "@/onboarding/types";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const slideConfigs = [
+const slides: SlideData[] = [
   {
-    titleKey: "onboarding.intro.slide1.title",
-    subtitleKey: "onboarding.intro.slide1.subtitle",
-    bulletKeys: [
-      "onboarding.intro.slide1.bullet1",
-      "onboarding.intro.slide1.bullet2",
+    title: "Benvenuto in OpenMoney",
+    subtitle: "La tua finanza personale. In un unico posto. Gratis, per sempre.",
+    bullets: [
+      "Pieno controllo delle tue entrate e uscite ricorrenti",
+      "Grafici e report dettagliati del tuo patrimonio e non solo...",
     ],
     image: require("../../../assets/onboarding/onboarding-1.png"),
   },
   {
-    titleKey: "onboarding.intro.slide2.title",
-    subtitleKey: "onboarding.intro.slide2.subtitle",
-    bulletKeys: [
-      "onboarding.intro.slide2.bullet1",
-      "onboarding.intro.slide2.bullet2",
+    title: "Open Source e trasparente",
+    subtitle: "Repository pubblica su GitHub, puoi verificare il codice quando vuoi.",
+    bullets: [
+      "Codice pubblico",
+      "Nessuna logica nascosta",
     ],
     image: require("../../../assets/onboarding/onboarding-2.png"),
   },
   {
-    titleKey: "onboarding.intro.slide3.title",
-    subtitleKey: "onboarding.intro.slide3.subtitle",
-    bulletKeys: [
-      "onboarding.intro.slide3.bullet1",
-      "onboarding.intro.slide3.bullet2",
-      "onboarding.intro.slide3.bullet3",
+    title: "Privacy by Design",
+    subtitle: "Offline-first, funziona senza connessione. \nI tuoi dati restano sul tuo dispositivo.",
+    bullets: [
+      "Nessun account",
+      "Nessun cloud",
+      "Nessun tracciamento",
     ],
     image: require("../../../assets/onboarding/onboarding-3.png"),
   },
   {
-    titleKey: "onboarding.intro.slide4.title",
-    subtitleKey: "onboarding.intro.slide4.subtitle",
-    bulletKeys: [],
+    title: "Iniziamo subito",
+    subtitle: "Pochi passaggi per configurare OpenMoney.",
+    bullets: [],
     image: require("../../../assets/onboarding/onboarding-4.png"),
   },
 ];
@@ -63,35 +62,20 @@ export default function OnboardingIntro({ onComplete, shouldSeedOnComplete }: Pr
   const flatListRef = useRef<FlatList<SlideData>>(null);
   const { width } = useWindowDimensions();
   const [contentHeight, setContentHeight] = useState(0);
-  const { t } = useTranslation();
-  const slides: SlideData[] = useMemo(
-    () =>
-      slideConfigs.map((slide) => ({
-        title: t(slide.titleKey),
-        subtitle: t(slide.subtitleKey).replace(/\\n/g, "\n"),
-        bullets: slide.bulletKeys.map((key) => t(key)),
-        image: slide.image,
-      })),
-    [t]
-  );
 
   const handleSkip = () => {
-    Alert.alert(
-      t("onboarding.intro.skipTitle"),
-      t("onboarding.intro.skipMessage"),
-      [
-        { text: t("common.cancel"), style: "cancel", onPress: () => { } },
-        {
-          text: t("common.skip"),
-          onPress: async () => {
-            if (shouldSeedOnComplete) await setOnboardingCompleted(true);
-            onComplete();
-          },
+    Alert.alert("Saltare la configurazione?", "Puoi farla in seguito dal profilo.", [
+      { text: "Annulla", style: "cancel" },
+      {
+        text: "Salta",
+        onPress: async () => {
+          if (shouldSeedOnComplete) await setOnboardingCompleted(true);
+          onComplete();
         },
-      ],
-      { cancelable: true }
-    );
+      },
+    ]);
   };
+
   const scrollToIndex = (index: number) => {
     flatListRef.current?.scrollToIndex({ index, animated: true });
   };
@@ -146,10 +130,10 @@ export default function OnboardingIntro({ onComplete, shouldSeedOnComplete }: Pr
       {/* Niente insets.bottom qui. SafeAreaView edges=bottom lo gestisce già */}
       <View style={styles.footer}>
         <Button mode="contained" buttonColor={tokens.colors.accent} onPress={handlePrimaryPress}>
-          {activeIndex >= slides.length - 1 ? t("onboarding.intro.start") : t("common.continue")}
+          {activeIndex >= slides.length - 1 ? "Inizia" : "Continua"}
         </Button>
         <Button mode="text" textColor={tokens.colors.muted} onPress={handleSkip}>
-          {t("onboarding.intro.skip")}
+          Salta per ora
         </Button>
       </View>
     </SafeAreaView>

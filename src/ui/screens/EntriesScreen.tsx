@@ -22,6 +22,7 @@ import {
   SegmentedControlPill,
   SmallOutlinePillButton,
 } from "@/ui/components/EntriesUI";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type EntryType = "income" | "expense";
 type FormMode = "create" | "edit";
@@ -467,11 +468,8 @@ export default function EntriesScreen(): JSX.Element {
 
         {entryType === "expense" && activeCategories.length > 0 ? (
           <GlassCardContainer contentStyle={{ gap: 8 }}>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={[styles.filterRow, { paddingHorizontal: 4 }]}
-            >
+            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t("entries.list.filterByCategory", { defaultValue: "Filtra per categoria" })}</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={[styles.filterRow, { paddingHorizontal: 4 }]}>
               <Pressable
                 onPress={() => setCategoryFilter("all")}
                 style={[
@@ -482,7 +480,7 @@ export default function EntriesScreen(): JSX.Element {
                   },
                 ]}
               >
-                <Text style={{ color: tokens.colors.text, fontWeight: "600" }}>Tutti</Text>
+                <Text style={{ color: tokens.colors.text, fontWeight: "600" }}>{t("common.all", { defaultValue: "Tutti" })}</Text>
               </Pressable>
               {activeCategories.map((cat) => {
                 const selected = categoryFilter === cat.id;
@@ -506,12 +504,12 @@ export default function EntriesScreen(): JSX.Element {
           </GlassCardContainer>
         ) : null}
 
-        <GlassCardContainer contentStyle={{ gap: 10, paddingBottom: 8 }}>
+        <GlassCardContainer contentStyle={{ gap: 8, paddingBottom: 6 }}>
           <FlatList
             data={sortedEntries}
             keyExtractor={(item) => `${entryType}-${item.id}`}
             scrollEnabled={false}
-            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
             ListEmptyComponent={
               <Text style={{ color: tokens.colors.muted, paddingVertical: 12 }}>{t("entries.empty.noEntries")}</Text>
             }
@@ -549,7 +547,7 @@ export default function EntriesScreen(): JSX.Element {
                       {amountText}
                     </Text>
                     <SmallOutlinePillButton
-                      label={t("common.edit")}
+                      label=""
                       onPress={() => {
                         (navigation as any).setParams({
                           formMode: "edit",
@@ -560,6 +558,7 @@ export default function EntriesScreen(): JSX.Element {
                         scrollToForm();
                       }}
                       color={tokens.colors.accent}
+                      icon={<MaterialCommunityIcons name="pencil-outline" size={16} color={tokens.colors.accent} />}
                     />
                   </View>
                 </GlassCardContainer>
@@ -623,9 +622,9 @@ const styles = StyleSheet.create({
   listRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    gap: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   listContent: {
     flex: 1,
@@ -653,9 +652,9 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
   },
   entryAmount: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "800",
-    minWidth: 82,
+    minWidth: 74,
     textAlign: "right",
   },
 });

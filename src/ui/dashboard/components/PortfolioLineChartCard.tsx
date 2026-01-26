@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
 import { Text } from "react-native-paper";
 import {
@@ -24,13 +24,27 @@ type Props = {
   data: PortfolioPoint[];
   hideHeader?: boolean;
   noCard?: boolean;
+  modes?: ("total" | "liquidity" | "investments")[];
 };
 
-export default function PortfolioLineChartCard({ data, hideHeader = false, noCard = false }: Props): JSX.Element {
+export default function PortfolioLineChartCard({
+  data,
+  hideHeader = false,
+  noCard = false,
+  modes,
+}: Props): JSX.Element {
   const { tokens } = useDashboardTheme();
   const { t } = useTranslation();
-  const [mode, setMode] = useState<Mode>("total");
+  const availableModes = (modes ?? ["total", "liquidity", "investments"]) as Mode[];
+  const [mode, setMode] = useState<Mode>(availableModes[0]);
   const { width } = useWindowDimensions();
+
+  // Ensure mode is always one of the available options
+  useEffect(() => {
+    if (!availableModes.includes(mode)) {
+      setMode(availableModes[0]);
+    }
+  }, [availableModes, mode]);
 
   const chartData = useMemo(
     () =>
@@ -51,25 +65,27 @@ export default function PortfolioLineChartCard({ data, hideHeader = false, noCar
   const content = (
     <>
       {!hideHeader && <SectionHeader title={t("dashboard.portfolio.header")} />}
-      <View style={styles.toggleRow}>
-        {(["total", "liquidity", "investments"] as Mode[]).map((item) => {
-          const label =
-            item === "total"
-              ? t("dashboard.portfolio.toggle.total")
-              : item === "liquidity"
-                ? t("dashboard.portfolio.toggle.liquidity")
-                : t("dashboard.portfolio.toggle.investments");
-          const active = item === mode;
-          return (
-            <PillChip
-              key={item}
-              label={label}
-              selected={active}
-              onPress={() => setMode(item)}
-            />
-          );
-        })}
-      </View>
+      {availableModes.length > 1 && (
+        <View style={styles.toggleRow}>
+          {availableModes.map((item) => {
+            const label =
+              item === "total"
+                ? t("dashboard.portfolio.toggle.total")
+                : item === "liquidity"
+                  ? t("dashboard.portfolio.toggle.liquidity")
+                  : t("dashboard.portfolio.toggle.investments");
+            const active = item === mode;
+            return (
+              <PillChip
+                key={item}
+                label={label}
+                selected={active}
+                onPress={() => setMode(item)}
+              />
+            );
+          })}
+        </View>
+      )}
       {chartData.length === 0 ? (
         <Text style={[styles.empty, { color: tokens.colors.muted }]}>{t("dashboard.portfolio.empty")}</Text>
       ) : (

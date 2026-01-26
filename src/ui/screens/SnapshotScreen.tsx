@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Platform, RefreshControl, ScrollView, StyleSheet, View, Pressable } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Text, TextInput } from "react-native-paper";
 import { useRoute } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
@@ -80,12 +79,23 @@ const formatHeroMonth = (key: string) => {
   return `${labelMonth.slice(0, 3)} ${year.slice(-2)}`;
 };
 
+const formatShortDate = (isoDate: string | null): string => {
+  if (!isoDate || !isIsoDate(isoDate)) {
+    return "";
+  }
+  const date = new Date(isoDate);
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yy = String(date.getFullYear()).slice(-2);
+  return `${dd}-${mm}-${yy}`;
+};
+
 export default function SnapshotScreen(): JSX.Element {
   const { tokens } = useDashboardTheme();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const { showInvestments } = useSettings();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const route = useRoute();
   const openNew = (route.params as { openNew?: boolean } | undefined)?.openNew;
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
@@ -99,7 +109,6 @@ export default function SnapshotScreen(): JSX.Element {
   const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showAllMonths, setShowAllMonths] = useState(false);
   const [activeMonthKey, setActiveMonthKey] = useState<string | null>(null);
   const [focusedLineId, setFocusedLineId] = useState<number | null>(null);
@@ -200,7 +209,7 @@ export default function SnapshotScreen(): JSX.Element {
       amount: lineMap.get(wallet.id) ?? "0",
     }));
     setDraftLines(initialLines);
-    setSnapshotDate(snapshot.date);
+    setSnapshotDate(todayIso());
     setEditingSnapshotId(snapshotId);
     setShowForm(true);
   };
@@ -208,15 +217,6 @@ export default function SnapshotScreen(): JSX.Element {
   const updateDraftLine = (index: number, patch: Partial<DraftLine>) => {
     setDraftLines((prev) => prev.map((line, i) => (i === index ? { ...line, ...patch } : line)));
   };
-
-  const toIsoDate = (value: Date): string => {
-    const y = value.getFullYear();
-    const m = String(value.getMonth() + 1).padStart(2, "0");
-    const d = String(value.getDate()).padStart(2, "0");
-    return `${y}-${m}-${d}`;
-  };
-
-  const datePickerValue = snapshotDate && isIsoDate(snapshotDate) ? new Date(snapshotDate) : new Date();
 
   const confirmOverwrite = () =>
     new Promise<boolean>((resolve) => {
@@ -382,7 +382,7 @@ export default function SnapshotScreen(): JSX.Element {
         {activeMonth && (
           <GlassCardContainer contentStyle={{ gap: 16 }}>
             <View style={styles.heroHeader}>
-              <Text style={[styles.sectionLabel, { color: tokens.colors.muted }]}>Current Month</Text>
+              <Text style={[styles.sectionLabel, { color: tokens.colors.muted }]}>{t("snapshot.hero.currentMonth")}</Text>
               <View
                 style={[
                   styles.statusBadge,
@@ -393,7 +393,7 @@ export default function SnapshotScreen(): JSX.Element {
                 ]}
               >
                 <Text style={{ color: activeMonth.snapshots.length ? tokens.colors.green : tokens.colors.red, fontWeight: "700" }}>
-                  {activeMonth.snapshots.length ? "Saved" : "Missing"}
+                  {activeMonth.snapshots.length ? t("snapshot.hero.saved") : t("snapshot.hero.missing")}
                 </Text>
               </View>
             </View>
@@ -446,7 +446,7 @@ export default function SnapshotScreen(): JSX.Element {
 
         {monthGroups.length > 0 && (
           <GlassCardContainer contentStyle={{ gap: 12 }}>
-            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>Recent months</Text>
+            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t("snapshot.hero.recentMonths")}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.recentRow}>
               {monthGroups.slice(0, 6).map((group) => (
                 <PillChip
@@ -482,21 +482,7 @@ export default function SnapshotScreen(): JSX.Element {
                 activeOutlineColor={tokens.colors.accent}
                 textColor={tokens.colors.text}
                 style={{ backgroundColor: tokens.colors.surface2 }}
-                onPressIn={() => setShowDatePicker(true)}
               />
-              {showDatePicker && (
-                <DateTimePicker
-                  value={datePickerValue}
-                  mode="date"
-                  display={Platform.OS === "ios" ? "spinner" : "default"}
-                  onChange={(_, selected) => {
-                    if (selected) {
-                      setSnapshotDate(toIsoDate(selected));
-                    }
-                    setShowDatePicker(false);
-                  }}
-                />
-              )}
               {draftLines.map((line, index) => {
                 const wallet = orderedWallets.find((item) => item.id === line.walletId);
                 const walletTitle = wallet
@@ -564,67 +550,106 @@ export default function SnapshotScreen(): JSX.Element {
 
         {monthGroups.length === 0 ? (
           <GlassCardContainer>
-            <SectionHeader title={t("snapshot.title")} />
-            <Text style={{ color: tokens.colors.muted, padding: 16 }}>
+            <SectionHeader
+              title={t("snapshot.title")}
+              trailing={
+                monthKeyFromDate(todayIso()) ? (
+                  <Text style={{ color: tokens.colors.muted, fontWeight: "600" }}>
+                    {formatHeroMonth(monthKeyFromDate(todayIso())!)}
+                  </Text>
+                ) : null
+              }
+            />
+            <View style={{ paddingHorizontal: 16, paddingTop: 6, paddingBottom: 12 }}>
+              <PrimaryPillButton
+                label={t("snapshot.actions.new")}
+                onPress={() => {
+                  void openNewSnapshot();
+                }}
+                color={tokens.colors.accent}
+              />
+            </View>
+            <Text style={{ color: tokens.colors.muted, paddingHorizontal: 16, paddingBottom: 6 }}>
               {t("snapshot.empty.noSnapshots")}
+            </Text>
+            <Text style={{ color: tokens.colors.text, paddingHorizontal: 16, paddingBottom: 12 }}>
+              {(() => {
+                const key = "snapshot.empty.firstHint";
+                const value = t(key);
+                if (value !== key) return value;
+                return i18n.resolvedLanguage?.startsWith("it")
+                  ? "Dopo aver configurato i wallet, aggiungi qui il tuo primo snapshot."
+                  : "After setting up wallets, add your first snapshot here.";
+              })()}
             </Text>
           </GlassCardContainer>
         ) : null}
 
-        <GlassCardContainer contentStyle={{ gap: 12 }}>
-          <SectionHeader title={t("snapshot.detail.title")} />
-          <View style={{ gap: 8 }}>
-            {lines.length === 0 && (
-              <Text style={{ color: tokens.colors.muted }}>
-                {t("snapshot.detail.emptyLines")}
-              </Text>
-            )}
-            {sortedLines.map((line) => {
-              const walletLabel =
-                line.wallet_type === "INVEST" && line.wallet_tag
-                  ? `${line.wallet_tag} • ${line.wallet_name ?? t("wallets.snapshot.unknown")}`
-                  : line.wallet_name ?? t("wallets.snapshot.unknown");
-              const wallet = walletById.get(line.wallet_id);
-              const currencySuffix = wallet ? currencySymbol(wallet.currency) : "";
-              return (
-                <Pressable
-                  key={line.id}
-                  style={styles.accountRow}
-                  hitSlop={10}
-                  onPress={() => {
-                    // TODO: navigate to account detail if available
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: tokens.colors.text, fontWeight: "700" }}>{walletLabel}</Text>
-                  </View>
-                  <Text style={{ color: tokens.colors.text, fontWeight: "700" }}>
-                    {formatAmount(line.amount)}
-                    {currencySuffix ? ` ${currencySuffix}` : ""}
+        {monthGroups.length > 0 && (
+          <GlassCardContainer contentStyle={{ gap: 12 }}>
+            <SectionHeader
+              title={t("snapshot.detail.title")}
+              trailing={
+                formatShortDate(selectedSnapshot?.date ?? snapshotDate) ? (
+                  <Text style={{ color: tokens.colors.muted, fontWeight: "600" }}>
+                    {formatShortDate(selectedSnapshot?.date ?? snapshotDate)}
                   </Text>
-                  <MaterialCommunityIcons name="chevron-right" size={20} color={tokens.colors.muted} />
-                </Pressable>
-              );
-            })}
-          </View>
-        </GlassCardContainer>
+                ) : null
+              }
+            />
+            <View style={{ gap: 8 }}>
+              {lines.length === 0 && (
+                <Text style={{ color: tokens.colors.muted }}>
+                  {t("snapshot.detail.emptyLines")}
+                </Text>
+              )}
+              {sortedLines.map((line) => {
+                const walletLabel =
+                  line.wallet_type === "INVEST" && line.wallet_tag
+                    ? `${line.wallet_tag} • ${line.wallet_name ?? t("wallets.snapshot.unknown")}`
+                    : line.wallet_name ?? t("wallets.snapshot.unknown");
+                const wallet = walletById.get(line.wallet_id);
+                const currencySuffix = wallet ? currencySymbol(wallet.currency) : "";
+                return (
+                  <Pressable
+                    key={line.id}
+                    style={styles.accountRow}
+                    hitSlop={10}
+                    onPress={() => {
+                      // TODO: navigate to account detail if available
+                    }}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: tokens.colors.text, fontWeight: "700" }}>{walletLabel}</Text>
+                    </View>
+                    <Text style={{ color: tokens.colors.text, fontWeight: "700" }}>
+                      {formatAmount(line.amount)}
+                      {currencySuffix ? ` ${currencySuffix}` : ""}
+                    </Text>
+                    <MaterialCommunityIcons name="chevron-right" size={20} color={tokens.colors.muted} />
+                  </Pressable>
+                );
+              })}
+            </View>
+          </GlassCardContainer>
+        )}
 
         {lines.length > 0 && (
           <GlassCardContainer contentStyle={{ gap: 10 }}>
-            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>Summary</Text>
+            <Text style={[styles.sectionTitle, { color: tokens.colors.text }]}>{t("snapshot.summary.title")}</Text>
             <View style={styles.kpiRow}>
               <View style={[styles.kpiChip, { borderColor: `${tokens.colors.income}66`, backgroundColor: `${tokens.colors.accent}22` }]}>
-                <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>Liquidity</Text>
+                <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>{t("snapshot.totals.liquidity")}</Text>
                 <Text style={[styles.kpiValue, { color: tokens.colors.text }]}>{formatAmount(totals.liquidity)}{totalsCurrencySymbol ? ` ${totalsCurrencySymbol}` : ""}</Text>
               </View>
               {showInvestments && (
                 <View style={[styles.kpiChip, { borderColor: `${tokens.colors.accent}66`, backgroundColor: `${tokens.colors.accent}22` }]}>
-                  <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>Investments</Text>
+                  <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>{t("snapshot.totals.investments")}</Text>
                   <Text style={[styles.kpiValue, { color: tokens.colors.text }]}>{formatAmount(totals.investments)}{totalsCurrencySymbol ? ` ${totalsCurrencySymbol}` : ""}</Text>
                 </View>
               )}
               <View style={[styles.kpiChip, { borderColor: `${tokens.colors.green}66`, backgroundColor: `${tokens.colors.green}22` }]}>
-                <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>Net worth</Text>
+                <Text style={[styles.kpiLabel, { color: tokens.colors.muted }]}>{t("snapshot.totals.netWorth")}</Text>
                 <Text style={[styles.kpiValue, { color: tokens.colors.green }]}>{formatAmount(totals.netWorth)}{totalsCurrencySymbol ? ` ${totalsCurrencySymbol}` : ""}</Text>
               </View>
             </View>

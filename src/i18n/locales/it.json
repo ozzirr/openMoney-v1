@@ -16,6 +16,32 @@
     "update": "Aggiorna",
     "reset": "Reset"
   },
+  "onboardingV2": {
+    "common": {
+      "continue": "Continua",
+      "skip": "Salta"
+    },
+    "welcome": {
+      "title": "Benvenuto in Balance",
+      "subtitle": "La tua finanza personale. Semplice, privata, sotto controllo.",
+      "bullet1": "Traccia entrate e spese con chiarezza",
+      "bullet2": "Visualizza il tuo patrimonio nel tempo",
+      "bullet3": "Nessun account. Nessun cloud. Nessun tracking"
+    },
+    "name": {
+      "title": "Come ti chiami?",
+      "subtitle": "Useremo il tuo nome per darti il benvenuto in Balance.",
+      "placeholder": "Il tuo nome"
+    },
+    "investments": {
+      "title": "Hai investimenti?",
+      "subtitle": "Questo ci aiuta a configurare al meglio la tua dashboard.",
+      "optionYes": "Sì, ho investimenti",
+      "optionNo": "No, solo liquidità",
+      "helper": "Potrai modificare tutto in qualsiasi momento.",
+      "cta": "Inizia"
+    }
+  },
   "errors": {
     "genericTitle": "Errore",
     "generic": "Qualcosa è andato storto"
@@ -76,88 +102,6 @@
     },
     "reset": "Reset"
   },
-  "onboarding": {
-    "intro": {
-      "slide1": {
-        "title": "Benvenuto in Balance",
-        "subtitle": "La tua finanza personale. In un unico posto. Gratis, per sempre.",
-        "bullet1": "Pieno controllo delle tue entrate e uscite ricorrenti",
-        "bullet2": "Grafici e report dettagliati del tuo patrimonio e non solo..."
-      },
-      "slide2": {
-        "title": "Open Source e trasparente",
-        "subtitle": "Repository pubblica su GitHub, puoi verificare il codice quando vuoi.",
-        "bullet1": "Codice pubblico",
-        "bullet2": "Nessuna logica nascosta"
-      },
-      "slide3": {
-        "title": "Privacy by Design",
-        "subtitle": "Offline-first, funziona senza connessione. I tuoi dati restano sul tuo dispositivo.",
-        "bullet1": "Nessun account",
-        "bullet2": "Nessun cloud",
-        "bullet3": "Nessun tracciamento"
-      },
-      "slide4": {
-        "title": "Iniziamo subito",
-        "subtitle": "Pochi passaggi per configurare Balance."
-      },
-      "skipTitle": "Saltare la configurazione?",
-      "skipMessage": "Puoi farla in seguito dal profilo.",
-      "skip": "Salta per ora",
-      "start": "Inizia"
-    },
-    "wallets": {
-      "title": "Wallets",
-      "subtitle": "Scegli dove tieni i soldi e inserisci il tuo primo saldo.",
-      "liquidityTitle": "Wallet di liquidità",
-      "liquidityNameLabel": "Nome wallet",
-      "initialBalanceLabel": "Saldo iniziale",
-      "nameRequired": "Inserisci un nome",
-      "invalidNumber": "Inserisci un numero valido",
-      "investmentsTitle": "Ho investimenti",
-      "investmentNameLabel": "Nome investimento",
-      "investmentBalanceLabel": "Saldo iniziale",
-      "addInvestment": "Aggiungi un investimento"
-    },
-    "categories": {
-      "title": "Categorie",
-      "subtitle": "Seleziona le categorie che utilizzerai fin da subito.",
-      "defaultTitle": "Categorie predefinite",
-      "addedTitle": "Categorie aggiunte",
-      "addLabel": "Aggiungi categoria",
-      "categoryNameLabel": "Nome categoria",
-      "addButton": "Aggiungi"
-    },
-    "recurrence": {
-      "title": "Entrata ricorrente",
-      "subtitle": "Inserisci la tua entrata principale che arriva ogni mese.",
-      "destinationLabel": "Wallet di destinazione",
-      "incomeNameLabel": "Nome entrata",
-      "amountLabel": "Importo",
-      "amountError": "Inserisci un importo maggiore di zero",
-      "nextDateLabel": "Prossima data",
-      "frequencyInfo": "Frequenza: mensile"
-    },
-    "expenses": {
-      "title": "Aggiungi le tue spese",
-      "subtitle": "Inserisci almeno due uscite per tenere traccia delle spese iniziali.",
-      "counter": "{{count}}/3 (consigliate)",
-      "expenseTitle": "Spesa {{index}}",
-      "recurringLabel": "Ricorrente",
-      "titleLabel": "Titolo",
-      "amountLabel": "Importo",
-      "categoryLabel": "Categoria",
-      "walletLabel": "Wallet",
-      "dateLabel": "Data",
-      "nextDateLabel": "Prossima data",
-      "addAnother": "Aggiungi un'altra spesa"
-    },
-    "done": {
-      "title": "Pronto!",
-      "subtitle": "Hai impostato wallet, categorie, entrate e spese iniziali. Vai alla dashboard per continuare.",
-      "button": "Vai alla dashboard"
-    }
-  },
   "dashboard": {
     "errorTitle": "Impossibile caricare la dashboard",
     "emptyTitle": "Nessun dato disponibile",
@@ -179,6 +123,12 @@
         "investments": "Investimenti"
       },
       "empty": "Nessun dato disponibile."
+    },
+    "privacy": {
+      "title": "Privacy by design",
+      "body": "Offline-first. Dati solo sul tuo dispositivo. Codice open source e verificabile su GitHub.",
+      "dismiss": "Ho capito",
+      "learnMore": "Scopri di più"
     },
     "distribution": {
       "empty": "Nessun dato disponibile.",
@@ -263,6 +213,7 @@
       "newInvestTitle": "Nuovo wallet investimenti",
       "categoriesTitle": "Categorie di spesa",
       "newCategoryLabel": "Nuova categoria",
+      "addCategory": "Aggiungi",
       "noCategories": "Nessuna categoria configurata.",
       "categoryActive": "Attiva"
     },
@@ -325,6 +276,7 @@
       "toggleForm": "Aggiungi o modifica voci"
     },
     "empty": {
+      "noEntries": "Nessuna voce.",
       "noCategoriesActive": "Nessuna categoria attiva. Aggiungine una qui sotto."
     },
     "validation": {
@@ -369,6 +321,15 @@
   },
   "snapshot": {
     "title": "Snapshot",
+    "hero": {
+      "currentMonth": "Mese corrente",
+      "recentMonths": "Mesi recenti",
+      "saved": "Salvato",
+      "missing": "Mancante"
+    },
+    "summary": {
+      "title": "Riepilogo"
+    },
     "actions": {
       "new": "Nuovo snapshot",
       "edit": "Modifica snapshot",
@@ -382,7 +343,8 @@
       "emptyLines": "Nessuna linea."
     },
     "empty": {
-      "noSnapshots": "Nessuno snapshot."
+      "noSnapshots": "Nessuno snapshot.",
+      "firstHint": "Dopo aver configurato i wallet, aggiungi qui il tuo primo snapshot."
     },
     "form": {
       "dateLabel": "Data"
