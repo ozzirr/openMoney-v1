@@ -128,11 +128,13 @@ export function SmallOutlinePillButton({
   onPress,
   color,
   icon,
+  fullWidth = false,
 }: {
   label: string;
   onPress: () => void;
   color: string;
   icon?: React.ReactNode;
+  fullWidth?: boolean;
 }): JSX.Element {
   const iconOnly = Boolean(icon) && !label;
   return (
@@ -141,6 +143,7 @@ export function SmallOutlinePillButton({
       style={({ pressed }) => [
         styles.smallOutline,
         iconOnly && styles.smallOutlineIconOnly,
+        fullWidth && styles.smallOutlineFullWidth,
         { borderColor: color, opacity: pressed ? 0.85 : 1 },
       ]}
     >
@@ -247,6 +250,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
     minWidth: 0,
+  },
+  smallOutlineFullWidth: {
+    width: "100%",
   },
   smallOutlineIcon: {
     alignItems: "center",

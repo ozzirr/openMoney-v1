@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Alert, Platform, ScrollView, StyleSheet, View } from "react-native";
-import { Button, SegmentedButtons, Switch, Text, TextInput } from "react-native-paper";
+import { Switch, Text, TextInput } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system";
 import * as LegacyFileSystem from "expo-file-system/legacy";
@@ -40,6 +40,9 @@ import type { SecurityModalStackParamList } from "@/security/securityFlowsTypes"
 import { useTranslation } from "react-i18next";
 import { STORAGE_KEY, SupportedLanguage } from "@/i18n";
 import { useSettings } from "@/settings/useSettings";
+import AppBackground from "@/ui/components/AppBackground";
+import { PrimaryPillButton, SegmentedControlPill, SmallOutlinePillButton } from "@/ui/components/EntriesUI";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 function findSecurityModalNavigation(
   navigation: NavigationProp<ParamListBase>
@@ -335,14 +338,14 @@ export default function SettingsScreen(): JSX.Element {
 
   const inputProps = {
     mode: "outlined" as const,
-    outlineColor: tokens.colors.border,
+    outlineColor: tokens.colors.glassBorder,
     activeOutlineColor: tokens.colors.accent,
     textColor: tokens.colors.text,
-    style: { backgroundColor: tokens.colors.surface2 },
+    style: { backgroundColor: tokens.colors.glassBg },
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: tokens.colors.bg }]}>
+    <AppBackground>
       <ScrollView
         contentContainerStyle={[
           styles.container,
@@ -350,8 +353,8 @@ export default function SettingsScreen(): JSX.Element {
         ]}
       >
         <PremiumCard>
-          <SectionHeader title={t("settings.profile.title")} />
-          <View style={styles.form}>
+          <View style={styles.cardContent}>
+            <SectionHeader title={t("settings.profile.title")} />
             <TextInput
               label={t("settings.profile.nameLabel")}
               value={profileName}
@@ -365,9 +368,10 @@ export default function SettingsScreen(): JSX.Element {
         </PremiumCard>
 
         <PremiumCard>
-          <SectionHeader title={t("settings.preferences.title")} />
-          <View style={styles.sectionContent}>
+          <View style={styles.cardContent}>
+            <SectionHeader title={t("settings.preferences.title")} />
             <View style={styles.row}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.darkTheme")}</Text>
               <Switch
                 value={mode === "dark"}
                 onValueChange={(value) => {
@@ -375,20 +379,22 @@ export default function SettingsScreen(): JSX.Element {
                   setMode(next);
                   updatePreference("theme", next);
                 }}
+                color={tokens.colors.accent}
               />
-              <Text style={{ color: tokens.colors.text }}>{t("settings.preferences.darkTheme")}</Text>
             </View>
             <View style={styles.row}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.prefillSnapshot")}</Text>
               <Switch
                 value={prefillSnapshot}
                 onValueChange={(value) => {
                   setPrefillSnapshot(value);
                   updatePreference("prefill_snapshot", String(value));
                 }}
+                color={tokens.colors.accent}
               />
-              <Text style={{ color: tokens.colors.text }}>{t("settings.preferences.prefillSnapshot")}</Text>
             </View>
             <View style={styles.row}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.showInvestments")}</Text>
               <Switch
                 value={showInvestments}
                 onValueChange={(value) => {
@@ -396,49 +402,47 @@ export default function SettingsScreen(): JSX.Element {
                 }}
                 color={tokens.colors.accent}
               />
-              <Text style={{ color: tokens.colors.text }}>{t("settings.preferences.showInvestments")}</Text>
             </View>
-            <View style={[styles.row, { gap: 12, marginTop: 8 }]}>
-              <Text style={{ color: tokens.colors.text }}>{t("settings.preferences.monthsInChart")}</Text>
-              <Button
-                mode="outlined"
-                textColor={tokens.colors.text}
-                onPress={() => {
-                  const next = Math.max(3, chartMonths - 1);
-                  setChartMonths(next);
-                  updatePreference("chart_points", String(next));
-                }}
-              >
-                -
-              </Button>
-              <Text style={{ color: tokens.colors.text }}>{chartMonths}</Text>
-              <Button
-                mode="outlined"
-                textColor={tokens.colors.text}
-                onPress={() => {
-                  const next = Math.min(12, chartMonths + 1);
-                  setChartMonths(next);
-                  updatePreference("chart_points", String(next));
-                }}
-              >
-                +
-              </Button>
+            <View style={[styles.row, styles.counterRow]}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.monthsInChart")}</Text>
+              <View style={styles.counterControls}>
+                <SmallOutlinePillButton
+                  label=""
+                  icon={<MaterialCommunityIcons name="minus" size={16} color={tokens.colors.text} />}
+                  color={tokens.colors.text}
+                  onPress={() => {
+                    const next = Math.max(3, chartMonths - 1);
+                    setChartMonths(next);
+                    updatePreference("chart_points", String(next));
+                  }}
+                />
+                <Text style={[styles.counterValue, { color: tokens.colors.text }]}>{chartMonths}</Text>
+                <SmallOutlinePillButton
+                  label=""
+                  icon={<MaterialCommunityIcons name="plus" size={16} color={tokens.colors.text} />}
+                  color={tokens.colors.text}
+                  onPress={() => {
+                    const next = Math.min(12, chartMonths + 1);
+                    setChartMonths(next);
+                    updatePreference("chart_points", String(next));
+                  }}
+                />
+              </View>
             </View>
-            <View style={[styles.languageRow, { marginTop: 12 }]}>
-              <Text style={{ color: tokens.colors.text }}>
-                {t("settings.preferences.languageLabel")}
-              </Text>
-              <SegmentedButtons
-                value={currentLanguage}
-                onValueChange={(value) => {
-                  void handleLanguageChange(value as SupportedLanguage);
-                }}
-                buttons={[
-                  { value: "it", label: t("settings.preferences.language.it") },
-                  { value: "en", label: t("settings.preferences.language.en") },
-                ]}
-                style={styles.languageControls}
-              />
+            <View style={styles.languageRow}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.languageLabel")}</Text>
+              <View style={styles.segmentControl}>
+                <SegmentedControlPill
+                  value={currentLanguage}
+                  onChange={(value) => {
+                    void handleLanguageChange(value as SupportedLanguage);
+                  }}
+                  options={[
+                    { value: "it", label: t("settings.preferences.language.it") },
+                    { value: "en", label: t("settings.preferences.language.en") },
+                  ]}
+                />
+              </View>
             </View>
           </View>
         </PremiumCard>
@@ -457,55 +461,50 @@ export default function SettingsScreen(): JSX.Element {
         />
 
         <PremiumCard>
-          <SectionHeader title={t("settings.data.title")} />
-          <View style={styles.sectionContent}>
-            <Button mode="contained" buttonColor={tokens.colors.accent} onPress={exportData}>
-              {t("settings.data.export")}
-            </Button>
-            <Button
-              mode="outlined"
-              textColor={tokens.colors.accent}
-              style={{ borderColor: tokens.colors.accent }}
-              onPress={importData}
-            >
-              {t("settings.data.import")}
-            </Button>
-            <Button
-              mode="outlined"
-              textColor={tokens.colors.accent}
+          <View style={styles.cardContent}>
+            <SectionHeader title={t("settings.data.title")} />
+            <PrimaryPillButton label={t("settings.data.export")} onPress={exportData} color={tokens.colors.accent} />
+            <SmallOutlinePillButton label={t("settings.data.import")} onPress={importData} color={tokens.colors.text} fullWidth />
+            <SmallOutlinePillButton
+              label={t("settings.data.pasteJsonFromClipboard")}
               onPress={pasteFromClipboard}
-              style={{ borderColor: tokens.colors.accent }}
-            >
-              {t("settings.data.pasteJsonFromClipboard")}
-            </Button>
-            <Button
-              mode="outlined"
-              textColor={tokens.colors.accent}
-              style={{ borderColor: tokens.colors.accent }}
+              color={tokens.colors.text}
+              fullWidth
+            />
+            <SmallOutlinePillButton
+              label={t("settings.data.loadTestData")}
               onPress={loadSampleDataHandler}
+              color={tokens.colors.text}
+              fullWidth
+            />
+          </View>
+        </PremiumCard>
+
+        <PremiumCard>
+          <View style={styles.cardContent}>
+            <SectionHeader title={t("settings.onboarding.title")} />
+            <View
+              style={[
+                styles.onboardingRow,
+                { borderColor: tokens.colors.glassBorder, backgroundColor: tokens.colors.glassBg },
+              ]}
             >
-              {t("settings.data.loadTestData")}
-            </Button>
-            <View style={[styles.onboardingRow, { borderColor: tokens.colors.border, backgroundColor: tokens.colors.surface2 }]}>
               <View style={styles.onboardingText}>
-                <Text style={[styles.onboardingTitle, { color: tokens.colors.text }]}>
-                  {t("settings.onboarding.title")}
-                </Text>
                 <Text style={[styles.onboardingSubtitle, { color: tokens.colors.muted }]}>
                   {t("settings.onboarding.subtitle")}
                 </Text>
               </View>
-              <Button mode="text" textColor={tokens.colors.accent} onPress={requestReplay}>
-                {t("settings.onboarding.reviewAction")}
-              </Button>
+              <SmallOutlinePillButton
+                label={t("settings.onboarding.reviewAction")}
+                onPress={requestReplay}
+                color={tokens.colors.accent}
+              />
             </View>
-            <Button mode="outlined" textColor={tokens.colors.red} onPress={resetData}>
-              {t("settings.reset")}
-            </Button>
+            <SmallOutlinePillButton label={t("settings.reset")} onPress={resetData} color={tokens.colors.red} fullWidth />
           </View>
         </PremiumCard>
       </ScrollView>
-    </View>
+    </AppBackground>
   );
 }
 
@@ -516,19 +515,35 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
   },
-  form: {
-    gap: 12,
-  },
-  sectionContent: {
+  cardContent: {
     gap: 12,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    justifyContent: "space-between",
+    gap: 12,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    flex: 1,
+  },
+  counterRow: {
+    alignItems: "center",
+  },
+  counterControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  counterValue: {
+    minWidth: 24,
+    textAlign: "center",
+    fontWeight: "700",
   },
   onboardingRow: {
-    borderRadius: 12,
+    borderRadius: 14,
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -547,11 +562,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   languageRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    gap: 10,
   },
-  languageControls: {
-    flex: 1,
+  segmentControl: {
+    width: "100%",
   },
 });

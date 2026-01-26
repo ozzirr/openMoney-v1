@@ -40,16 +40,20 @@ export default function SecuritySettingsSection({
       <SectionHeader title={t("security.settings.title")} />
       <View style={styles.content}>
         <View style={styles.row}>
+          <Text style={[styles.label, { color: tokens.colors.text }]}>{t("security.settings.requirePin")}</Text>
           <Switch
             value={securityEnabled}
             onValueChange={onRequestEnableSecurity}
             color={tokens.colors.accent}
           />
-            <Text style={[styles.label, { color: tokens.colors.text }]}>{t("security.settings.requirePin")}</Text>
         </View>
         <Pressable
           onPress={onRequestChangeOrSetPin}
-          style={({ pressed }) => [styles.actionRow, pressed && styles.pressed]}
+          style={({ pressed }) => [
+            styles.actionRow,
+            { borderColor: tokens.colors.glassBorder, backgroundColor: tokens.colors.glassBg },
+            pressed && styles.pressed,
+          ]}
           accessibilityRole="button"
         >
           <Text style={[styles.actionLabel, { color: tokens.colors.text }]}>{actionLabel}</Text>
@@ -57,12 +61,6 @@ export default function SecuritySettingsSection({
         </Pressable>
         {biometryAvailable ? (
           <View style={styles.row}>
-            <Switch
-              value={biometryEnabled && securityEnabled}
-              onValueChange={onToggleBiometry}
-              color={tokens.colors.accent}
-              disabled={!securityEnabled}
-            />
             <View style={styles.biometryText}>
               <Text style={[styles.label, { color: securityEnabled ? tokens.colors.text : tokens.colors.muted }]}>
                 {t("security.settings.useFaceId")}
@@ -73,16 +71,17 @@ export default function SecuritySettingsSection({
                 </Text>
               ) : null}
             </View>
+            <Switch
+              value={biometryEnabled && securityEnabled}
+              onValueChange={onToggleBiometry}
+              color={tokens.colors.accent}
+              disabled={!securityEnabled}
+            />
           </View>
         ) : null}
         {securityEnabled ? (
           <View style={styles.row}>
-            <Switch
-              value={autoLockEnabled}
-              onValueChange={onToggleAutoLock}
-              color={tokens.colors.accent}
-            />
-            <View>
+            <View style={styles.biometryText}>
               <Text style={[styles.label, { color: tokens.colors.text }]}>
                 {t("security.settings.autoLockTitle")}
               </Text>
@@ -90,12 +89,21 @@ export default function SecuritySettingsSection({
                 {t("security.settings.autoLockSubtitle")}
               </Text>
             </View>
+            <Switch
+              value={autoLockEnabled}
+              onValueChange={onToggleAutoLock}
+              color={tokens.colors.accent}
+            />
           </View>
         ) : null}
         {securityEnabled ? (
           <Pressable
             onPress={onRequestDisableSecurity}
-            style={({ pressed }) => [styles.actionRow, pressed && styles.pressed]}
+            style={({ pressed }) => [
+              styles.actionRow,
+              { borderColor: tokens.colors.glassBorder, backgroundColor: tokens.colors.glassBg },
+              pressed && styles.pressed,
+            ]}
             accessibilityRole="button"
           >
             <Text style={[styles.actionLabel, { color: tokens.colors.red }]}>
@@ -117,23 +125,25 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     gap: 12,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "600",
   },
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.08)",
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
   actionLabel: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: "600",
   },
   pressed: {
     opacity: 0.7,
@@ -143,6 +153,7 @@ const styles = StyleSheet.create({
   },
   biometryText: {
     flex: 1,
+    marginRight: 12,
   },
   helperText: {
     fontSize: 12,
