@@ -216,4 +216,25 @@ export const migrations: Migration[] = [
       { sql: "UPDATE expense_categories SET color = '#9B7BFF' WHERE color IS NULL OR color = ''" },
     ],
   },
+  {
+    version: 7,
+    statements: [
+      { sql: "ALTER TABLE wallets ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0" },
+      {
+        sql: `UPDATE wallets
+          SET sort_order = (
+            SELECT COUNT(*)
+            FROM wallets AS other
+            WHERE other.type = wallets.type
+              AND other.id <= wallets.id
+          ) - 1`,
+      },
+    ],
+  },
+  {
+    version: 8,
+    statements: [
+      { sql: "ALTER TABLE wallets ADD COLUMN color TEXT NOT NULL DEFAULT '#9B7BFF'" },
+    ],
+  },
 ];

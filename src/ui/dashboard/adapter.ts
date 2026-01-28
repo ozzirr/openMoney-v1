@@ -1,7 +1,8 @@
 import { breakdownByWallet, totalsByWalletType } from "@/domain/calculations";
 import { averageMonthlyTotals, totalsForMonth } from "@/domain/finance";
 import { listOccurrencesInRange, upcomingOccurrences } from "@/domain/recurrence";
-import type { ExpenseCategory, ExpenseEntry, IncomeEntry, Snapshot, SnapshotLineDetail } from "@/repositories/types";
+import type { ExpenseCategory, ExpenseEntry, IncomeEntry, Snapshot, SnapshotLineDetail, Wallet } from "@/repositories/types";
+import { orderWalletsForUI } from "@/domain/walletOrdering";
 import { addDays, getFrequencyKey } from "@/utils/recurrence";
 import i18n from "i18next";
 import type {
@@ -23,6 +24,7 @@ type DashboardInput = {
   expenseEntries: ExpenseEntry[];
   expenseCategories: ExpenseCategory[];
   chartPoints: number;
+  wallets: Wallet[];
 };
 
 const palette = ["#9B7BFF", "#5C9DFF", "#F6C177", "#66D19E", "#C084FC", "#FF8FAB", "#6EE7B7", "#94A3B8"];
@@ -141,16 +143,26 @@ function buildKpis(
   return items;
 }
 
-function buildDistribution(latestLines: SnapshotLineDetail[]): DistributionItem[] {
-  const items = breakdownByWallet(latestLines)
-    .sort((a, b) => b.value - a.value)
-    .map((item, index) => ({
-      id: `${item.label}-${index}`,
-      label: item.label,
+function buildDistribution(latestLines: SnapshotLineDetail[], wallets: Wallet[]): DistributionItem[] {
+  if (wallets.length === 0) return [];
+  const walletTotals = new Map<number, number>();
+  latestLines.forEach((line) => {
+    if (!line.wallet_id) return;
+    walletTotals.set(line.wallet_id, (walletTotals.get(line.wallet_id) ?? 0) + line.amount);
+  });
+  const orderedWallets = orderWalletsForUI(wallets);
+  return orderedWallets
+    .map((wallet) => ({
+      wallet,
+      value: walletTotals.get(wallet.id) ?? 0,
+    }))
+    .filter((item) => item.value !== 0)
+    .map((item) => ({
+      id: `${item.wallet.id}`,
+      label: item.wallet.name,
       value: item.value,
-      color: palette[index % palette.length],
+      color: item.wallet.color ?? palette[item.wallet.id % palette.length],
     }));
-  return items;
 }
 
 function buildCashflow(income: IncomeEntry[], expense: ExpenseEntry[]): CashflowMonth[] {
@@ -252,7 +264,7 @@ export function buildDashboardData(input: DashboardInput, showInvestments = true
     input.chartPoints
   );
   const kpis = buildKpis(input.latestLines, portfolio, showInvestments);
-  const distributions = buildDistribution(input.latestLines);
+  const distributions = buildDistribution(input.latestLines, input.wallets);
   const cashflowMonths = buildCashflow(input.incomeEntries, input.expenseEntries);
   const averages = averageMonthlyTotals(
     input.incomeEntries,

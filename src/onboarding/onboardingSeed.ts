@@ -1,5 +1,5 @@
 import { withTransaction } from "@/db/db";
-import { createWallet, listWallets } from "@/repositories/walletsRepo";
+import { createWallet, listWallets, DEFAULT_WALLET_COLOR } from "@/repositories/walletsRepo";
 import { createExpenseCategory, listExpenseCategories } from "@/repositories/expenseCategoriesRepo";
 import { getInitialSeedDone, setInitialSeedDone } from "@/onboarding/onboardingStorage";
 
@@ -76,8 +76,8 @@ export async function seedOnboardingData(draft: OnboardingDraft): Promise<void> 
     const createWalletRecord = async (name: string, type: "LIQUIDITY" | "INVEST") => {
       const cleaned = name.trim() || (type === "LIQUIDITY" ? "Conto principale" : "Investimento");
       const result = await db.runAsync(
-        "INSERT INTO wallets (name, type, currency, tag, active) VALUES (?, ?, 'EUR', NULL, 1)",
-        [cleaned, type]
+        "INSERT INTO wallets (name, type, currency, tag, active, color) VALUES (?, ?, 'EUR', NULL, 1, ?)",
+        [cleaned, type, DEFAULT_WALLET_COLOR]
       );
       walletIds[cleaned] = result.lastInsertRowId ?? 0;
       return cleaned;

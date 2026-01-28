@@ -5,11 +5,13 @@ import type { DashboardTokens } from "@/ui/dashboard/tokens";
 type DashboardTheme = {
   tokens: DashboardTokens;
   shadows: typeof dashboardShadows;
+  isDark: boolean;
 };
 
 const DashboardThemeContext = React.createContext<DashboardTheme>({
   tokens: createDashboardTokens(true),
   shadows: dashboardShadows,
+  isDark: true,
 });
 
 export function DashboardThemeProvider({
@@ -21,7 +23,13 @@ export function DashboardThemeProvider({
 }): JSX.Element {
   const tokens = createDashboardTokens(isDark);
   return (
-    <DashboardThemeContext.Provider value={{ tokens, shadows: dashboardShadows }}>
+    <DashboardThemeContext.Provider
+      value={{
+        tokens,
+        shadows: dashboardShadows,
+        isDark,
+      }}
+    >
       {children}
     </DashboardThemeContext.Provider>
   );

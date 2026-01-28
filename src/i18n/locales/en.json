@@ -92,7 +92,6 @@
       "title": "Data",
       "export": "Export",
       "import": "Import",
-      "pasteJsonFromClipboard": "Paste JSON from clipboard",
       "loadTestData": "Load test data"
     },
     "onboarding": {
@@ -214,6 +213,10 @@
     "list": {
       "tabLiquidity": "Liquidity",
       "tabInvest": "Investments",
+      "reorderTitle": "Reorder wallets",
+      "reorderHint": "Tap the arrow to move a wallet to the top",
+      "editOrder": "Edit order",
+      "doneOrder": "Done",
       "addWallet": "Add wallet",
       "newLiquidityTitle": "New liquidity wallet",
       "newInvestTitle": "New investment wallet",
@@ -229,7 +232,8 @@
     "form": {
       "name": "Name",
       "brokerLabel": "Broker",
-      "investmentTypeLabel": "Investment type"
+      "investmentTypeLabel": "Investment type",
+      "colorLabel": "Color"
     },
     "actions": {
       "limitTitle": "Limit reached",

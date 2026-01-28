@@ -134,6 +134,7 @@ export default function DashboardScreen(): JSX.Element {
           expenseEntries,
           expenseCategories,
           chartPoints,
+          wallets,
         },
         showInvestments
       );

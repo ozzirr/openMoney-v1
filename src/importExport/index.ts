@@ -3,6 +3,7 @@ import { executeSql, withTransaction } from "@/db/db";
 import type { ExportPayload } from "./types";
 import { isIsoDate } from "@/utils/dates";
 import type { SnapshotLine } from "@/repositories/types";
+import { DEFAULT_WALLET_COLOR } from "@/repositories/walletsRepo";
 
 const REQUIRED_KEYS: (keyof ExportPayload)[] = [
   "version",
@@ -110,8 +111,8 @@ export async function importFromJson(payload: ExportPayload): Promise<void> {
 
     for (const row of payload.wallets) {
       await db.runAsync(
-        "INSERT INTO wallets (id, name, type, currency, tag, active) VALUES (?, ?, ?, ?, ?, ?)",
-        [row.id, row.name, row.type, row.currency, row.tag, row.active]
+        "INSERT INTO wallets (id, name, type, currency, tag, active, color) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [row.id, row.name, row.type, row.currency, row.tag, row.active, row.color ?? DEFAULT_WALLET_COLOR]
       );
     }
 

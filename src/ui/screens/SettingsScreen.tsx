@@ -7,7 +7,6 @@ import * as FileSystem from "expo-file-system";
 import * as LegacyFileSystem from "expo-file-system/legacy";
 import * as DocumentPicker from "expo-document-picker";
 import * as Sharing from "expo-sharing";
-import * as Clipboard from "expo-clipboard";
 import { exportToJson, importFromFile, importFromJson } from "@/importExport";
 import type { ExportPayload } from "@/importExport/types";
 import { runMigrations, withTransaction } from "@/db/db";
@@ -200,28 +199,6 @@ export default function SettingsScreen(): JSX.Element {
         });
         return;
       }
-    } catch (error) {
-      console.warn(error);
-    }
-  };
-
-  const pasteFromClipboard = async () => {
-    try {
-      const copy = (await Clipboard.getStringAsync())?.trim();
-      if (!copy) return;
-      const confirmed = await confirmWipeAndReplace(
-        "alerts.settings.pasteJson.title",
-        "alerts.settings.pasteJson.body"
-      );
-      if (!confirmed) return;
-      let payload: unknown;
-      try {
-        payload = JSON.parse(copy);
-      } catch {
-        return;
-      }
-      await runMigrations();
-      await importFromJson(payload);
     } catch (error) {
       console.warn(error);
     }
@@ -469,12 +446,6 @@ export default function SettingsScreen(): JSX.Element {
             <SectionHeader title={t("settings.data.title")} />
             <PrimaryPillButton label={t("settings.data.export")} onPress={exportData} color={tokens.colors.accent} />
             <SmallOutlinePillButton label={t("settings.data.import")} onPress={importData} color={tokens.colors.text} fullWidth />
-            <SmallOutlinePillButton
-              label={t("settings.data.pasteJsonFromClipboard")}
-              onPress={pasteFromClipboard}
-              color={tokens.colors.text}
-              fullWidth
-            />
             <SmallOutlinePillButton
               label={t("settings.data.loadTestData")}
               onPress={loadSampleDataHandler}

@@ -16,6 +16,7 @@ import { getPreference } from "@/repositories/preferencesRepo";
 import type { Snapshot, SnapshotLineDetail, Wallet, Currency } from "@/repositories/types";
 import { isIsoDate, todayIso } from "@/utils/dates";
 import { totalsByWalletType } from "@/domain/calculations";
+import { orderWalletsForUI } from "@/domain/walletOrdering";
 import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -340,11 +341,7 @@ export default function SnapshotScreen(): JSX.Element {
   );
   const totals = useMemo(() => totalsByWalletType(lines), [lines]);
   const sortedLines = useMemo(() => [...lines].sort((a, b) => b.amount - a.amount), [lines]);
-  const orderedWallets = useMemo(() => {
-    const liquidity = wallets.filter((wallet) => wallet.type === "LIQUIDITY");
-    const invest = wallets.filter((wallet) => wallet.type === "INVEST");
-    return [...liquidity, ...invest];
-  }, [wallets]);
+  const orderedWallets = useMemo(() => orderWalletsForUI(wallets), [wallets]);
   const walletById = useMemo(() => {
     const map = new Map<number, Wallet>();
     wallets.forEach((wallet) => map.set(wallet.id, wallet));

@@ -1,11 +1,13 @@
 import { withTransaction } from "@/db/db";
 import type { Currency, RecurrenceFrequency, WalletType } from "@/repositories/types";
+import { DEFAULT_WALLET_COLOR } from "@/repositories/walletsRepo";
 
 type SampleWallet = {
   name: string;
   type: WalletType;
   currency: Currency;
   tag: string | null;
+  color: string;
 };
 
 type SampleIncomeEntry = {
@@ -34,9 +36,9 @@ type SampleSnapshot = {
 };
 
 const sampleWallets: SampleWallet[] = [
-  { name: "Conto corrente", type: "LIQUIDITY", currency: "EUR", tag: "Casa" },
-  { name: "Pocket cash", type: "LIQUIDITY", currency: "EUR", tag: "Cash" },
-  { name: "Broker ETF", type: "INVEST", currency: "EUR", tag: "ETF" },
+  { name: "Conto corrente", type: "LIQUIDITY", currency: "EUR", tag: "Casa", color: DEFAULT_WALLET_COLOR },
+  { name: "Pocket cash", type: "LIQUIDITY", currency: "EUR", tag: "Cash", color: "#5C9DFF" },
+  { name: "Broker ETF", type: "INVEST", currency: "EUR", tag: "ETF", color: "#F6C177" },
 ];
 
 const sampleExpenseCategories = [
@@ -139,8 +141,8 @@ export async function loadSampleData(): Promise<void> {
     const walletIds: Record<string, number> = {};
     for (const wallet of sampleWallets) {
       const result = await db.runAsync(
-        "INSERT INTO wallets (name, type, currency, tag, active) VALUES (?, ?, ?, ?, 1)",
-        [wallet.name, wallet.type, wallet.currency, wallet.tag]
+        "INSERT INTO wallets (name, type, currency, tag, active, color) VALUES (?, ?, ?, ?, 1, ?)",
+        [wallet.name, wallet.type, wallet.currency, wallet.tag, wallet.color]
       );
       walletIds[wallet.name] = result.lastInsertRowId ?? 0;
     }

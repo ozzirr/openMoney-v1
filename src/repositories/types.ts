@@ -9,6 +9,8 @@ export type Wallet = {
   currency: Currency;
   tag: string | null;
   active: number;
+  color: string;
+  sortOrder: number;
 };
 
 export type ExpenseCategory = {
