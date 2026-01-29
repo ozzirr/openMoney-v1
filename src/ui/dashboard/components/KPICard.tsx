@@ -23,6 +23,7 @@ export default function KPICard({ item, emphasizeValue = false }: Props): JSX.El
     if (item.id === "investments") return "trending-up";
     return "shield-star";
   }, [item.id]);
+  const hasDelta = item.deltaStatus !== "NO_DATA";
   const deltaIsPositive = item.deltaValue >= 0;
   const deltaColor = deltaIsPositive ? tokens.colors.green : tokens.colors.red;
 
@@ -74,14 +75,22 @@ export default function KPICard({ item, emphasizeValue = false }: Props): JSX.El
           {formatEUR(displayValue)}
         </Text>
         <View style={styles.deltaRow}>
-          <Text style={[styles.deltaValue, { color: deltaColor }]}>
-            {deltaIsPositive ? "+" : ""}
-            {formatEUR(item.deltaValue)}
-          </Text>
-          <Text style={[styles.deltaPct, { color: deltaColor }]}>
-            {deltaIsPositive ? "+" : ""}
-            {formatPct(item.deltaPct)}
-          </Text>
+          {hasDelta ? (
+            <>
+              <Text style={[styles.deltaValue, { color: deltaColor }]}>
+                {deltaIsPositive ? "+" : ""}
+                {formatEUR(item.deltaValue)}
+              </Text>
+              <Text style={[styles.deltaPct, { color: deltaColor }]}>
+                {deltaIsPositive ? "+" : ""}
+                {formatPct(item.deltaPct)}
+              </Text>
+            </>
+          ) : (
+            <Text style={[styles.deltaUnavailable, { color: tokens.colors.muted }]}>
+              Dati insufficienti
+            </Text>
+          )}
         </View>
         {expanded && item.breakdown?.length ? (
           <View style={styles.breakdown}>
@@ -134,6 +143,10 @@ const styles = StyleSheet.create({
   },
   deltaPct: {
     fontSize: 13,
+  },
+  deltaUnavailable: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   breakdown: {
     marginTop: 12,

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balance – Finanze personali in un'unica app.</title>
+    <meta name="description"
+        content="Balance è un'app open source per monitorare wallet, patrimonio e investimenti. Gratis, privacy-first, in continua evoluzione grazie alla community.">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <link rel="apple-touch-icon" href="assets/icon.png">
+    <link rel="shortcut icon" href="assets/favicon.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Inter from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="glass-nav">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <img src="assets/icon.png" alt="Balance Logo" class="logo-icon">
+                Balance
+            </a>
+            <div class="nav-links">
+                <a href="#problem">Perché Balance</a>
+                <a href="#features">Funzionalità</a>
+                <a href="#pricing">Prezzi</a>
+                <a href="#download" class="btn btn-sm btn-white">Download</a>
+            </div>
+            <button class="mobile-menu-btn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container hero-container">
+            <div class="hero-content reveal">
+                <h1 class="hero-title">Tutte le tue finanze in un'unica app</h1>
+                <p class="hero-subtitle">Liquidità, investimenti e flussi di cassa in un unico posto.
+                </p>
+                <p class="hero-value-prop">Open source e privacy-first. In continua evoluzione grazie ai feedback e
+                    contributi della community.</p>
+
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary"><i class="fa-brands fa-apple"></i> App Store</a>
+                    <a href="#" class="btn btn-secondary"><i class="fa-brands fa-google-play"></i> Google Play</a>
+                </div>
+            </div>
+
+            <div class="hero-visual reveal delayed">
+                <div class="iphone-3d-wrap" data-iphone style="transform: rotateY(-15deg) rotateX(10deg);">
+                    <div class="iphone-3d">
+                        <div class="iphone-screen">
+                            <div class="carousel-container" id="hero-carousel">
+                                <div class="carousel-wrapper" id="carousel-wrapper">
+                                    <!-- Slides -->
+                                    <div class="carousel-slide active">
+                                        <img src="assets/screenshots/1.png" alt="Balance Trend">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/2.png" alt="Balance Charts">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/3.png" alt="Balance Snapshot">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/4.png" alt="Balance Wallet">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/5.png" alt="Balance Investimenti">
+                                    </div>
+                                </div>
+                                <div class="carousel-indicators" id="carousel-indicators">
+                                    <button class="indicator active" data-index="0" aria-label="Slide 1"></button>
+                                    <button class="indicator" data-index="1" aria-label="Slide 2"></button>
+                                    <button class="indicator" data-index="2" aria-label="Slide 3"></button>
+                                    <button class="indicator" data-index="3" aria-label="Slide 4"></button>
+                                    <button class="indicator" data-index="4" aria-label="Slide 5"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Section -->
+    <section id="problem" class="section-split">
+        <div class="container split-container split-reverse reveal">
+            <div class="split-content">
+                <h2 class="section-title">Una sola vista, finalmente chiara</h2>
+                <p class="section-text">
+                    Conti bancari, contanti, investimenti e crypto vivono in app diverse. Il risultato è sempre lo
+                    stesso: nessuna fotografia reale del patrimonio.
+                </p>
+                <p class="section-text highlight-text">
+                    Balance riunisce tutto in un’unica dashboard. Inserisci i wallet una sola volta, aggiorna i dati
+                    quando vuoi, senza sincronizzazioni invasive o connessioni alle banche.
+                </p>
+            </div>
+            <div class="split-visual">
+                <img src="assets/onboarding-3.png" alt="Mascot" class="mascot-decoration mascot-pos-1">
+                <div class="iphone-3d-wrap" data-iphone>
+                    <div class="iphone-3d">
+                        <div class="iphone-screen">
+                            <div class="carousel-container" id="wallet-carousel">
+                                <div class="carousel-wrapper">
+                                    <div class="carousel-slide active">
+                                        <img src="assets/screenshots/4.png" alt="Wallet Liquidità">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/5.png" alt="Wallet Investimenti">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What Is Balance -->
+    <section class="section-split">
+        <div class="container split-container reveal">
+            <div class="split-content">
+                <h2 class="section-title">Trend e snapshot, senza rumore</h2>
+                <p class="section-text">
+                    Balance non è un semplice tracker di spese. Qui vedi l’evoluzione reale del tuo patrimonio, mese
+                    dopo mese, con snapshot chiari e confronti immediati.
+                </p>
+                <p class="section-text highlight-text">
+                    Grafici puliti, numeri essenziali e una timeline leggibile. I dati restano sul tuo dispositivo e la
+                    lettura è sempre immediata.
+                </p>
+            </div>
+            <div class="split-visual">
+                <img src="assets/onboarding-1.png" alt="Mascot" class="mascot-decoration mascot-pos-2">
+                <div class="iphone-3d-wrap" data-iphone>
+                    <div class="iphone-3d">
+                        <div class="iphone-screen">
+                            <div class="carousel-container" id="charts-carousel">
+                                <div class="carousel-wrapper">
+                                    <div class="carousel-slide active">
+                                        <img src="assets/screenshots/1.png" alt="Andamento">
+                                    </div>
+                                    <div class="carousel-slide">
+                                        <img src="assets/screenshots/2.png" alt="Grafici">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Philosophy -->
+    <section class="section-split">
+        <div class="container split-container split-reverse reveal">
+            <div class="split-content">
+                <h2 class="section-title">Open source, davvero</h2>
+                <p class="section-text">
+                    Gestire il patrimonio richiede fiducia. Balance è completamente open source: ogni riga è
+                    ispezionabile e la roadmap è pubblica.
+                </p>
+                <p class="section-text highlight-text">
+                    Segnala bug, proponi feature o contribuisci al codice. Qui l’app evolve con la community, non con
+                    algoritmi nascosti.
+                </p>
+            </div>
+            <div class="split-visual">
+                <div class="mascot-large-wrap reveal">
+                    <img src="assets/onboarding-3.png" alt="Balance Robot" class="mascot-large">
+                    <div class="mascot-link-overlay">
+                        <a href="https://github.com/ozzirr/balance-app-v1" target="_blank" class="btn btn-github">
+                            <i class="fa-brands fa-github"></i> Vedi Repo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section-grid">
+        <div class="container">
+            <h2 class="section-title center-text reveal">Funzionalità principali</h2>
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="glass-card feature-card reveal">
+                    <div class="icon-box"><i class="fa-solid fa-camera"></i></div>
+                    <h3>Snapshot patrimoniali</h3>
+                    <p>Scatta una fotografia del tuo patrimonio quando vuoi e confrontala nel tempo con un tap.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="glass-card feature-card reveal delayed-1">
+                    <div class="icon-box"><i class="fa-solid fa-wallet"></i></div>
+                    <h3>Wallet per tipo</h3>
+                    <p>Organizza liquidità e investimenti come preferisci. Colori e categorie rendono tutto leggibile.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="glass-card feature-card reveal delayed-2">
+                    <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+                    <h3>Dashboard essenziale</h3>
+                    <p>Liquidità, investimenti e patrimonio netto in una sola vista. I numeri che contano davvero.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="glass-card feature-card reveal">
+                    <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Privacy garantita</h3>
+                    <p>I tuoi dati restano sul dispositivo. Nessun server esterno, nessun accesso alle banche.</p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="glass-card feature-card reveal delayed-1">
+                    <div class="icon-box"><i class="fa-solid fa-bolt"></i></div>
+                    <h3>Veloce e intuitiva</h3>
+                    <p>Interfaccia pulita, poche azioni, zero frizioni. Inserisci e aggiorna in pochi secondi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Free vs Pro -->
+    <section id="pricing" class="section-pricing">
+        <div class="container reveal">
+            <h2 class="section-title center-text">Scegli il piano per te</h2>
+            <div class="pricing-grid">
+                <div class="glass-card pricing-card">
+                    <div class="badge badge-green">Gratis per sempre</div>
+                    <h3>Balance</h3>
+                    <div class="pricing-price">€0 <span class="price-suffix">nessun limite di tempo</span></div>
+                    <ul class="pricing-list">
+                        <li>Fino a 3 wallet totali</li>
+                        <li>Dashboard completa</li>
+                        <li>Snapshot essenziali</li>
+                    </ul>
+                    <button class="btn btn-secondary full-width open-modal">Scarica gratis</button>
+                </div>
+                <div class="glass-card pricing-card pro">
+                    <div class="badge">Offerta lancio fino al 31/12/2026</div>
+                    <h3>Balance Pro</h3>
+                    <div class="pricing-price">€3.99 <span class="price-suffix">pagamento unico</span></div>
+                    <ul class="pricing-list">
+                        <li>Wallet illimitati</li>
+                        <li>Snapshot avanzati</li>
+                        <li>Storico completo senza limiti</li>
+                    </ul>
+                    <button class="btn btn-primary full-width open-modal">Passa a Pro</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Target Users -->
+    <section class="section-list">
+        <div class="container reveal">
+            <div class="glass-panel target-panel">
+                <h2 class="section-title">Perfetto se vuoi</h2>
+                <ul class="styled-list">
+                    <li><i class="fa-solid fa-check"></i> Vedere tutto il patrimonio in un colpo d’occhio</li>
+                    <li><i class="fa-solid fa-check"></i> Tenere insieme liquidità, investimenti e crypto</li>
+                    <li><i class="fa-solid fa-check"></i> Smettere con fogli Excel e app diverse</li>
+                    <li><i class="fa-solid fa-check"></i> Controllare i dati senza condividerli con terze parti</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section id="leaderboard" class="section-leaderboard">
+        <div class="container reveal">
+            <h2 class="section-title center-text">Top Contributors</h2>
+            <p class="section-text center-text">Balance migliora grazie a chi segnala bug, suggerisce feature e
+                contribuisce al codice.</p>
+
+            <div class="glass-card leaderboard-card">
+                <div id="leaderboard-list" class="leaderboard-list">
+                    <!-- Skeleton Loader -->
+                    <div class="leaderboard-skeleton">
+                        <div class="skeleton-row"></div>
+                        <div class="skeleton-row"></div>
+                        <div class="skeleton-row"></div>
+                    </div>
+                </div>
+                <div class="leaderboard-footer">
+                    <a href="https://github.com/ozzirr/balance-app-v1" target="_blank" class="btn btn-secondary btn-sm">
+                        <i class="fa-brands fa-github"></i> Vedi su GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="download">
+        <div class="container footer-cta reveal">
+            <h2 class="section-title">Inizia oggi stesso</h2>
+            <p class="mb-40">Balance è gratis su App Store e Google Play. Nessuna carta richiesta.</p>
+            <div class="hero-buttons center-content mb-40">
+                <a href="#" class="btn btn-primary"><i class="fa-brands fa-apple"></i> App Store</a>
+                <a href="#" class="btn btn-secondary"><i class="fa-brands fa-google-play"></i> Google Play</a>
+            </div>
+        </div>
+        <div class="container footer-container">
+            <p class="copyright">© Balance App. Tutti i diritti riservati.</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Termini e Condizioni</a>
+                <a href="contacts.html">Contatti</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+
+    <!-- Download Modal -->
+    <div id="download-modal" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="glass-card modal-content reveal active">
+                <button class="modal-close" id="modal-close">&times;</button>
+                <h2 class="section-title center-text">Scarica Balance</h2>
+                <p class="center-text mb-32">Scegli la piattaforma e inizia a gestire le tue finanze.</p>
+                <div class="hero-buttons center-content">
+                    <a href="#" class="btn btn-primary"><i class="fa-brands fa-apple"></i> App Store</a>
+                    <a href="#" class="btn btn-secondary"><i class="fa-brands fa-google-play"></i> Google Play</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

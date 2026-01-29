@@ -13,9 +13,11 @@ import { getPreference, setPreference } from "@/repositories/preferencesRepo";
 import type { SnapshotLineDetail } from "@/repositories/types";
 import { todayIso } from "@/utils/dates";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
-import type { DashboardData } from "@/ui/dashboard/types";
+import { getKpiDeltaRangeLabel } from "@/ui/dashboard/types";
+import type { DashboardData, KpiDeltaRange } from "@/ui/dashboard/types";
 import { buildDashboardData, createMockDashboardData } from "@/ui/dashboard/adapter";
 import KPIStrip from "@/ui/dashboard/components/KPIStrip";
+import RangeSelector from "@/ui/dashboard/components/RangeSelector";
 import PortfolioLineChartCard from "@/ui/dashboard/components/PortfolioLineChartCard";
 import DonutDistributionCard from "@/ui/dashboard/components/DonutDistributionCard";
 import CashflowOverviewCard from "@/ui/dashboard/components/CashflowOverviewCard";
@@ -25,7 +27,7 @@ import PressScale from "@/ui/dashboard/components/PressScale";
 import Skeleton from "@/ui/dashboard/components/Skeleton";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import AppBackground from "@/ui/components/AppBackground";
-import { GlassCardContainer, PillChip, SegmentedControlPill, SmallOutlinePillButton } from "@/ui/components/EntriesUI";
+import { GlassCardContainer, PillChip, SmallOutlinePillButton } from "@/ui/components/EntriesUI";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/settings/useSettings";
@@ -91,8 +93,20 @@ export default function DashboardScreen(): JSX.Element {
   const [sectionStates, setSectionStates] = useState<Record<string, boolean>>(DEFAULT_SECTION_STATES);
   const [sectionsLoaded, setSectionsLoaded] = useState(false);
   const [showPrivacyCard, setShowPrivacyCard] = useState(false);
+  const [kpiDeltaRange, setKpiDeltaRange] = useState<KpiDeltaRange>("28D");
   const { t } = useTranslation();
   const { showInvestments } = useSettings();
+  const kpiRangeOptions = useMemo(
+    () => ([
+      { value: "1D", label: getKpiDeltaRangeLabel("1D") },
+      { value: "7D", label: getKpiDeltaRangeLabel("7D") },
+      { value: "28D", label: getKpiDeltaRangeLabel("28D") },
+      { value: "3M", label: getKpiDeltaRangeLabel("3M") },
+      { value: "6M", label: getKpiDeltaRangeLabel("6M") },
+      { value: "12M", label: getKpiDeltaRangeLabel("12M") },
+    ] as const),
+    []
+  );
 
   const load = useCallback(async () => {
     setError(null);
@@ -136,7 +150,8 @@ export default function DashboardScreen(): JSX.Element {
           chartPoints,
           wallets,
         },
-        showInvestments
+        showInvestments,
+        kpiDeltaRange
       );
       setDashboard(data);
 
@@ -155,7 +170,7 @@ export default function DashboardScreen(): JSX.Element {
       setError(err instanceof Error ? err.message : "Errore durante il caricamento.");
       setDashboard(createMockDashboardData(showInvestments));
     }
-  }, [navigation, prompted, showInvestments]);
+  }, [kpiDeltaRange, navigation, prompted, showInvestments]);
 
   useEffect(() => {
     let canceled = false;
@@ -277,11 +292,19 @@ export default function DashboardScreen(): JSX.Element {
         {dashboard ? (
           <>
             <View style={styles.greetingBlock}>
-              <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
-                {profileName
-                  ? t("dashboard.greetingWithName", { name: profileName })
-                  : t("dashboard.greeting")}
-              </Text>
+              <View style={styles.greetingRow}>
+                <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
+                  {profileName
+                    ? t("dashboard.greetingWithName", { name: profileName })
+                    : t("dashboard.greeting")}
+                </Text>
+                <RangeSelector
+                  selectedRange={kpiDeltaRange}
+                  onChangeRange={setKpiDeltaRange}
+                  options={kpiRangeOptions}
+                  showLabel={false}
+                />
+              </View>
               <KPIStrip items={dashboard.kpis} />
             </View>
             {showPrivacyCard && (
@@ -389,6 +412,13 @@ const styles = StyleSheet.create({
   greetingBlock: {
     gap: 10,
   },
+  greetingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    gap: 12,
+  },
   privacyHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
@@ -453,6 +483,9 @@ const styles = StyleSheet.create({
     fontSize: 34,
     fontWeight: "700",
     letterSpacing: 0.25,
+    flexShrink: 1,
+    flexGrow: 1,
+    minWidth: 180,
   },
   emptyBody: {
     marginTop: 6,

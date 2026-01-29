@@ -3,7 +3,7 @@ import { averageMonthlyTotals, totalsForMonth } from "@/domain/finance";
 import { listOccurrencesInRange, upcomingOccurrences } from "@/domain/recurrence";
 import type { ExpenseCategory, ExpenseEntry, IncomeEntry, Snapshot, SnapshotLineDetail, Wallet } from "@/repositories/types";
 import { orderWalletsForUI } from "@/domain/walletOrdering";
-import { addDays, getFrequencyKey } from "@/utils/recurrence";
+import { addDays, addMonthsClamped, getFrequencyKey } from "@/utils/recurrence";
 import i18n from "i18next";
 import type {
   CashflowMonth,
@@ -12,6 +12,7 @@ import type {
   DashboardData,
   DistributionItem,
   KPIItem,
+  KpiDeltaRange,
   PortfolioPoint,
   RecurrenceRow,
 } from "./types";
@@ -88,15 +89,16 @@ function buildPortfolioSeries(
 function buildKpis(
   latestLines: SnapshotLineDetail[],
   portfolio: PortfolioPoint[],
-  showInvestments = true
+  showInvestments = true,
+  range: KpiDeltaRange = "28D",
+  snapshots: Snapshot[] = [],
+  snapshotLines: Record<number, SnapshotLineDetail[]> = {}
 ): KPIItem[] {
   const totals = totalsByWalletType(latestLines);
-  const last = portfolio[portfolio.length - 1];
-  const prev = portfolio[portfolio.length - 2];
-  const deltaTotal = last && prev ? last.total - prev.total : 0;
-  const deltaLiquidity = last && prev ? last.liquidity - prev.liquidity : 0;
-  const deltaInvest = last && prev ? last.investments - prev.investments : 0;
-  const pct = (delta: number, base: number) => (base === 0 ? 0 : delta / base);
+  const deltaResult = buildKpiDeltaForRange(range, snapshots, portfolio, snapshotLines);
+  const deltaTotal = deltaResult.deltas.total.deltaAbs;
+  const deltaLiquidity = deltaResult.deltas.liquidity.deltaAbs;
+  const deltaInvest = deltaResult.deltas.investments.deltaAbs;
   const toBreakdown = (lines: SnapshotLineDetail[]) =>
     breakdownByWallet(lines)
       .filter((item) => item.label)
@@ -111,7 +113,8 @@ function buildKpis(
     label: i18n.t("dashboard.kpi.liquidity"),
     value: totals.liquidity,
     deltaValue: deltaLiquidity,
-    deltaPct: pct(deltaLiquidity, prev?.liquidity ?? 0),
+    deltaPct: deltaResult.deltas.liquidity.deltaPct,
+    deltaStatus: deltaResult.status,
     accent: palette[0],
     breakdown: liquidityBreakdown,
   };
@@ -120,7 +123,8 @@ function buildKpis(
     label: i18n.t("dashboard.kpi.investments"),
     value: totals.investments,
     deltaValue: deltaInvest,
-    deltaPct: pct(deltaInvest, prev?.investments ?? 0),
+    deltaPct: deltaResult.deltas.investments.deltaPct,
+    deltaStatus: deltaResult.status,
     accent: palette[1],
     breakdown: investBreakdown,
   };
@@ -129,7 +133,8 @@ function buildKpis(
     label: i18n.t("dashboard.kpi.netWorth"),
     value: totals.netWorth,
     deltaValue: deltaTotal,
-    deltaPct: pct(deltaTotal, prev?.total ?? 0),
+    deltaPct: deltaResult.deltas.total.deltaPct,
+    deltaStatus: deltaResult.status,
     accent: palette[3],
     breakdown: netWorthBreakdown,
   };
@@ -141,6 +146,128 @@ function buildKpis(
     items.push(netWorthItem);
   }
   return items;
+}
+
+type DeltaPair = { deltaAbs: number; deltaPct: number };
+type KpiDeltaStatus = "OK" | "NO_DATA";
+type KpiDeltaResult = {
+  status: KpiDeltaStatus;
+  deltas: {
+    liquidity: DeltaPair;
+    investments: DeltaPair;
+    total: DeltaPair;
+  };
+  meta?: { startDate: string; endDate: string };
+};
+
+const EMPTY_DELTA: DeltaPair = { deltaAbs: 0, deltaPct: 0 };
+
+function monthKeyFromIso(iso: string): string {
+  return iso.slice(0, 7);
+}
+
+function shiftMonthKey(monthKey: string, months: number): string {
+  return addMonthsClamped(`${monthKey}-01`, months).slice(0, 7);
+}
+
+function findSnapshotBefore(snapshots: Snapshot[], isoDate: string): Snapshot | null {
+  for (const snapshot of snapshots) {
+    if (snapshot.date < isoDate) return snapshot;
+  }
+  return null;
+}
+
+function findSnapshotOnOrBefore(snapshots: Snapshot[], isoDate: string): Snapshot | null {
+  for (const snapshot of snapshots) {
+    if (snapshot.date <= isoDate) return snapshot;
+  }
+  return null;
+}
+
+function totalsFromSnapshotLines(lines: SnapshotLineDetail[] | undefined | null) {
+  if (!lines) return null;
+  const totals = totalsByWalletType(lines);
+  return {
+    liquidity: totals.liquidity,
+    investments: totals.investments,
+    total: totals.netWorth,
+  };
+}
+
+function deltaFromTotals(endTotals: ReturnType<typeof totalsFromSnapshotLines>, startTotals: ReturnType<typeof totalsFromSnapshotLines>): KpiDeltaResult {
+  if (!endTotals || !startTotals) {
+    return {
+      status: "NO_DATA",
+      deltas: { liquidity: EMPTY_DELTA, investments: EMPTY_DELTA, total: EMPTY_DELTA },
+    };
+  }
+  const calc = (end: number, start: number): DeltaPair => ({
+    deltaAbs: end - start,
+    deltaPct: start === 0 ? 0 : (end - start) / start,
+  });
+  return {
+    status: "OK",
+    deltas: {
+      liquidity: calc(endTotals.liquidity, startTotals.liquidity),
+      investments: calc(endTotals.investments, startTotals.investments),
+      total: calc(endTotals.total, startTotals.total),
+    },
+  };
+}
+
+// Selezione delta: 1D = ultimo snapshot vs precedente; 7D/28D = ultimo snapshot vs snapshot <= end-7/28g;
+// 3M/6M/12M = ultimo punto mensile vs punto mensile <= target month.
+export function buildKpiDeltaForRange(
+  range: KpiDeltaRange,
+  snapshots: Snapshot[],
+  portfolioSeries: PortfolioPoint[],
+  snapshotLinesById: Record<number, SnapshotLineDetail[]>
+): KpiDeltaResult {
+  if (range === "1D" || range === "7D" || range === "28D") {
+    const endSnapshot = snapshots[0];
+    if (!endSnapshot) {
+      return { status: "NO_DATA", deltas: { liquidity: EMPTY_DELTA, investments: EMPTY_DELTA, total: EMPTY_DELTA } };
+    }
+    const endTotals = totalsFromSnapshotLines(snapshotLinesById[endSnapshot.id]);
+    const startSnapshot =
+      range === "1D"
+        ? findSnapshotBefore(snapshots, endSnapshot.date)
+        : findSnapshotOnOrBefore(snapshots, addDays(endSnapshot.date, range === "7D" ? -7 : -28));
+    if (!startSnapshot) {
+      return { status: "NO_DATA", deltas: { liquidity: EMPTY_DELTA, investments: EMPTY_DELTA, total: EMPTY_DELTA } };
+    }
+    const startTotals = totalsFromSnapshotLines(snapshotLinesById[startSnapshot.id]);
+    const result = deltaFromTotals(endTotals, startTotals);
+    return {
+      ...result,
+      meta: { startDate: startSnapshot.date, endDate: endSnapshot.date },
+    };
+  }
+
+  if (portfolioSeries.length < 2) {
+    return { status: "NO_DATA", deltas: { liquidity: EMPTY_DELTA, investments: EMPTY_DELTA, total: EMPTY_DELTA } };
+  }
+  const endPoint = portfolioSeries[portfolioSeries.length - 1];
+  const endKey = monthKeyFromIso(endPoint.date);
+  const monthsBack = range === "3M" ? -3 : range === "6M" ? -6 : -12;
+  const targetMonth = shiftMonthKey(endKey, monthsBack);
+  const startPoint = [...portfolioSeries].reverse().find((point) => monthKeyFromIso(point.date) <= targetMonth);
+  if (!startPoint) {
+    return { status: "NO_DATA", deltas: { liquidity: EMPTY_DELTA, investments: EMPTY_DELTA, total: EMPTY_DELTA } };
+  }
+  const calc = (end: number, start: number): DeltaPair => ({
+    deltaAbs: end - start,
+    deltaPct: start === 0 ? 0 : (end - start) / start,
+  });
+  return {
+    status: "OK",
+    deltas: {
+      liquidity: calc(endPoint.liquidity, startPoint.liquidity),
+      investments: calc(endPoint.investments, startPoint.investments),
+      total: calc(endPoint.total, startPoint.total),
+    },
+    meta: { startDate: startPoint.date, endDate: endPoint.date },
+  };
 }
 
 function buildDistribution(latestLines: SnapshotLineDetail[], wallets: Wallet[]): DistributionItem[] {
@@ -256,14 +383,18 @@ function buildRecurrences(
   });
 }
 
-export function buildDashboardData(input: DashboardInput, showInvestments = true): DashboardData {
+export function buildDashboardData(
+  input: DashboardInput,
+  showInvestments = true,
+  range: KpiDeltaRange = "28D"
+): DashboardData {
   const portfolio = buildPortfolioSeries(
     input.snapshots,
     input.snapshotLines,
     input.latestLines,
     input.chartPoints
   );
-  const kpis = buildKpis(input.latestLines, portfolio, showInvestments);
+  const kpis = buildKpis(input.latestLines, portfolio, showInvestments, range, input.snapshots, input.snapshotLines);
   const distributions = buildDistribution(input.latestLines, input.wallets);
   const cashflowMonths = buildCashflow(input.incomeEntries, input.expenseEntries);
   const averages = averageMonthlyTotals(

@@ -4,9 +4,25 @@ export type KPIItem = {
   value: number;
   deltaValue: number;
   deltaPct: number;
+  deltaStatus?: "OK" | "NO_DATA";
   accent?: string;
   breakdown?: { label: string; value: number }[];
 };
+
+export type KpiDeltaRange = "1D" | "7D" | "28D" | "3M" | "6M" | "12M";
+
+export const KPI_DELTA_RANGE_LABELS: Record<KpiDeltaRange, string> = {
+  "1D": "Oggi vs precedente",
+  "7D": "Ultimi 7 giorni",
+  "28D": "Ultimi 28 giorni",
+  "3M": "Ultimi 3 mesi",
+  "6M": "Ultimi 6 mesi",
+  "12M": "Ultimi 12 mesi",
+};
+
+export function getKpiDeltaRangeLabel(range: KpiDeltaRange): string {
+  return KPI_DELTA_RANGE_LABELS[range];
+}
 
 export type PortfolioPoint = {
   date: string;
