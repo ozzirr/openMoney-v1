@@ -10,7 +10,7 @@ import { createWallet, deleteWallet, listWallets, updateWallet, updateWalletSort
 import { getPreference } from "@/repositories/preferencesRepo";
 import type { Wallet, Currency, WalletType } from "@/repositories/types";
 import { APP_VARIANT, LIMITS } from "@/config/entitlements";
-import { openProStoreLink } from "@/config/storeLinks";
+import { openProWaitlistLink } from "@/config/storeLinks";
 import { DarkTheme, useFocusEffect, useNavigation, useRoute, type NavigationProp, type ParamListBase } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/settings/useSettings";
@@ -521,9 +521,9 @@ export default function WalletScreen(): JSX.Element {
     setShowAddWallet((prev) => ({ ...prev, [type]: true }));
   };
 
-  const handleOpenProStore = useCallback(async () => {
+  const handleOpenProWaitlist = useCallback(async () => {
     try {
-      await openProStoreLink();
+      await openProWaitlistLink();
       setLimitModalVisible(false);
     } catch {
       setStoreErrorVisible(true);
@@ -907,7 +907,7 @@ export default function WalletScreen(): JSX.Element {
         <LimitReachedModal
           visible={limitModalVisible}
           onClose={() => setLimitModalVisible(false)}
-          onUpgrade={handleOpenProStore}
+          onUpgrade={handleOpenProWaitlist}
         />
 
         <Snackbar visible={storeErrorVisible} onDismiss={() => setStoreErrorVisible(false)} duration={4000}>

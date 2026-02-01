@@ -31,7 +31,7 @@ import CoachTipCard from "@/ui/components/CoachTipCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useSettings } from "@/settings/useSettings";
-import { onDataReset } from "@/app/dataEvents";
+import { onDataChanged, onDataReset } from "@/app/dataEvents";
 
 type Nav = {
   navigate: (name: string, params?: Record<string, unknown>) => void;
@@ -51,30 +51,65 @@ const DEFAULT_SECTION_STATES: Record<string, boolean> = {
   prossimi: false,
 };
 
+type SectionId = "andamento" | "distribuzione" | "cashflow" | "categories" | "prossimi";
+
+const SECTION_ORDER: SectionId[] = [
+  "andamento",
+  "distribuzione",
+  "cashflow",
+  "categories",
+  "prossimi",
+];
+
 type SectionAccordionProps = {
   title: string;
   open: boolean;
   onToggle: () => void;
   children: React.ReactNode;
+  locked?: boolean;
+  lockedSubtitle?: string;
+  onLockedPress?: () => void;
 };
 
-const SectionAccordion = ({ title, open, onToggle, children }: SectionAccordionProps): JSX.Element => {
+const SectionAccordion = ({
+  title,
+  open,
+  onToggle,
+  children,
+  locked = false,
+  lockedSubtitle,
+  onLockedPress,
+}: SectionAccordionProps): JSX.Element => {
   const { tokens } = useDashboardTheme();
   const handleToggle = () => {
+    if (locked) {
+      onLockedPress?.();
+      return;
+    }
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     onToggle();
   };
+  const isOpen = !locked && open;
   return (
     <View style={styles.section}>
-      <GlassCardContainer>
+      <GlassCardContainer style={locked ? styles.lockedCard : undefined}>
         <PressScale
           style={[styles.cardHeader, { borderColor: tokens.colors.glassBorder }]}
           onPress={handleToggle}
         >
-          <Text style={[styles.accordionTitle, { color: tokens.colors.text }]}>{title}</Text>
-          <Text style={[styles.accordionIcon, { color: tokens.colors.muted }]}>{open ? "−" : "+"}</Text>
+          <View style={styles.cardTitleBlock}>
+            <Text style={[styles.accordionTitle, { color: tokens.colors.text }]}>{title}</Text>
+            {locked && lockedSubtitle ? (
+              <Text style={[styles.lockedSubtitle, { color: tokens.colors.muted }]}>{lockedSubtitle}</Text>
+            ) : null}
+          </View>
+          {locked ? (
+            <MaterialCommunityIcons name="lock-outline" size={20} color={tokens.colors.muted} />
+          ) : (
+            <Text style={[styles.accordionIcon, { color: tokens.colors.muted }]}>{isOpen ? "−" : "+"}</Text>
+          )}
         </PressScale>
-        {open && <View style={styles.accordionContent}>{children}</View>}
+        {isOpen && <View style={styles.accordionContent}>{children}</View>}
       </GlassCardContainer>
     </View>
   );
@@ -95,6 +130,14 @@ export default function DashboardScreen(): JSX.Element {
   const [sectionsLoaded, setSectionsLoaded] = useState(false);
   const [showPrivacyCard, setShowPrivacyCard] = useState(false);
   const [kpiDeltaRange, setKpiDeltaRange] = useState<KpiDeltaRange>("28D");
+  const [sectionAvailability, setSectionAvailability] = useState<Record<SectionId, boolean>>({
+    andamento: true,
+    distribuzione: true,
+    cashflow: true,
+    categories: true,
+    prossimi: true,
+  });
+  const [orderedSections, setOrderedSections] = useState<SectionId[]>(SECTION_ORDER);
   const { t } = useTranslation();
   const { showInvestments } = useSettings();
   const kpiRangeOptions = useMemo(
@@ -154,6 +197,17 @@ export default function DashboardScreen(): JSX.Element {
         kpiDeltaRange
       );
       setDashboard(data);
+      const hasRecurring =
+        incomeEntries.some((entry) => entry.recurrence_frequency && entry.one_shot === 0) ||
+        expenseEntries.some((entry) => entry.recurrence_frequency && entry.one_shot === 0);
+      const hasCashflowData = data.cashflow.months.some((month) => month.income !== 0 || month.expense !== 0);
+      setSectionAvailability({
+        andamento: snapshots.length >= 2,
+        distribuzione: data.distributions.length > 0,
+        cashflow: hasRecurring || hasCashflowData,
+        categories: data.categories.length > 0,
+        prossimi: data.recurrences.length > 0,
+      });
 
       const ask = await getPreference("ask_snapshot_on_start");
       setProfileName(profile?.value?.trim() ?? "");
@@ -228,6 +282,13 @@ export default function DashboardScreen(): JSX.Element {
     return () => subscription.remove();
   }, [load]);
 
+  useEffect(() => {
+    const subscription = onDataChanged(() => {
+      void load();
+    });
+    return () => subscription.remove();
+  }, [load]);
+
   const dismissPrivacyCard = useCallback(() => {
     setShowPrivacyCard(false);
     setPreference("privacy_tooltip_dismissed", "true").catch(() => {});
@@ -243,6 +304,25 @@ export default function DashboardScreen(): JSX.Element {
   }, [t]);
 
   const emptyState = walletsCount === 0 && !loading;
+  const lockedSubtitle = t("dashboard.locked.subtitle", { defaultValue: "Nessun dato disponibile" });
+
+  useEffect(() => {
+    if (loading || !dashboard) return;
+    const available = SECTION_ORDER.filter((key) => sectionAvailability[key]);
+    const locked = SECTION_ORDER.filter((key) => !sectionAvailability[key]);
+    setOrderedSections([...available, ...locked]);
+  }, [dashboard, loading, sectionAvailability]);
+
+  const handleLockedPress = useCallback(
+    (message: string) => {
+      Alert.alert(
+        t("dashboard.locked.title", { defaultValue: "Come sbloccarla" }),
+        message,
+        [{ text: t("common.close", { defaultValue: "Chiudi" }) }]
+      );
+    },
+    [t]
+  );
 
   const skeleton = useMemo(
     () => (
@@ -295,6 +375,9 @@ export default function DashboardScreen(): JSX.Element {
                     ? t("dashboard.greetingWithName", { name: profileName })
                     : t("dashboard.greeting")}
                 </Text>
+              </View>
+              <KPIStrip items={dashboard.kpis} />
+              <View style={styles.rangeRow}>
                 <RangeSelector
                   selectedRange={kpiDeltaRange}
                   onChangeRange={setKpiDeltaRange}
@@ -302,7 +385,6 @@ export default function DashboardScreen(): JSX.Element {
                   showLabel={false}
                 />
               </View>
-              <KPIStrip items={dashboard.kpis} />
             </View>
             {showPrivacyCard && (
               <CoachTipCard
@@ -327,61 +409,133 @@ export default function DashboardScreen(): JSX.Element {
               />
             )}
 
-            <SectionAccordion
-              title={t("dashboard.section.trend")}
-              open={sectionStates.andamento}
-              onToggle={() => handleToggleSection("andamento")}
-            >
-              <PortfolioLineChartCard
-                data={dashboard.portfolioSeries}
-                hideHeader
-                noCard
-                modes={showInvestments ? undefined : ["total"]}
-              />
-            </SectionAccordion>
-
-            <SectionAccordion
-              title={t("dashboard.section.distribution")}
-              open={sectionStates.distribuzione}
-              onToggle={() => handleToggleSection("distribuzione")}
-            >
-              <DonutDistributionCard items={dashboard.distributions} hideHeader noCard />
-            </SectionAccordion>
-
-            <SectionAccordion
-              title={t("dashboard.section.cashflow")}
-              open={sectionStates.cashflow}
-              onToggle={() => handleToggleSection("cashflow")}
-            >
-              <CashflowOverviewCard cashflow={dashboard.cashflow} hideHeader noCard />
-            </SectionAccordion>
-
-            <SectionAccordion
-              title={t("dashboard.section.categories")}
-              open={sectionStates.categories}
-              onToggle={() => handleToggleSection("categories")}
-            >
-              <CategoriesBreakdownCard items={dashboard.categories} hideHeader noCard />
-            </SectionAccordion>
-
-            <SectionAccordion
-              title={t("dashboard.section.recurrences")}
-              open={sectionStates.prossimi}
-              onToggle={() => handleToggleSection("prossimi")}
-            >
-              <RecurrencesTableCard
-                rows={dashboard.recurrences}
-                hideHeader
-                noCard
-                onPressRow={(row) =>
-                  navigation.navigate("Balance", {
-                    entryType: row.type,
-                    formMode: "edit",
-                    entryId: row.entryId,
-                  })
-                }
-              />
-            </SectionAccordion>
+            {orderedSections.map((sectionId) => {
+              const isAvailable = sectionAvailability[sectionId];
+              if (sectionId === "andamento") {
+                return (
+                  <SectionAccordion
+                    key={sectionId}
+                    title={t("dashboard.section.trend")}
+                    open={sectionStates.andamento}
+                    onToggle={() => handleToggleSection("andamento")}
+                    locked={!isAvailable}
+                    lockedSubtitle={lockedSubtitle}
+                    onLockedPress={() =>
+                      handleLockedPress(
+                        t("dashboard.locked.trend", {
+                          defaultValue:
+                            "Aggiungi almeno 2 snapshot in date diverse per vedere l’andamento nel tempo.",
+                        })
+                      )
+                    }
+                  >
+                    <PortfolioLineChartCard
+                      data={dashboard.portfolioSeries}
+                      hideHeader
+                      noCard
+                      modes={showInvestments ? undefined : ["total"]}
+                    />
+                  </SectionAccordion>
+                );
+              }
+              if (sectionId === "distribuzione") {
+                return (
+                  <SectionAccordion
+                    key={sectionId}
+                    title={t("dashboard.section.distribution")}
+                    open={sectionStates.distribuzione}
+                    onToggle={() => handleToggleSection("distribuzione")}
+                    locked={!isAvailable}
+                    lockedSubtitle={lockedSubtitle}
+                    onLockedPress={() =>
+                      handleLockedPress(
+                        t("dashboard.locked.distribution", {
+                          defaultValue:
+                            "Aggiungi il tuo primo snapshot per vedere la distribuzione del patrimonio.",
+                        })
+                      )
+                    }
+                  >
+                    <DonutDistributionCard items={dashboard.distributions} hideHeader noCard />
+                  </SectionAccordion>
+                );
+              }
+              if (sectionId === "cashflow") {
+                return (
+                  <SectionAccordion
+                    key={sectionId}
+                    title={t("dashboard.section.cashflow")}
+                    open={sectionStates.cashflow}
+                    onToggle={() => handleToggleSection("cashflow")}
+                    locked={!isAvailable}
+                    lockedSubtitle={lockedSubtitle}
+                    onLockedPress={() =>
+                      handleLockedPress(
+                        t("dashboard.locked.cashflow", {
+                          defaultValue:
+                            "Inserisci entrate e/o uscite ricorrenti per attivare il Cash Flow.",
+                        })
+                      )
+                    }
+                  >
+                    <CashflowOverviewCard cashflow={dashboard.cashflow} hideHeader noCard />
+                  </SectionAccordion>
+                );
+              }
+              if (sectionId === "categories") {
+                return (
+                  <SectionAccordion
+                    key={sectionId}
+                    title={t("dashboard.section.categories")}
+                    open={sectionStates.categories}
+                    onToggle={() => handleToggleSection("categories")}
+                    locked={!isAvailable}
+                    lockedSubtitle={lockedSubtitle}
+                    onLockedPress={() =>
+                      handleLockedPress(
+                        t("dashboard.locked.categories", {
+                          defaultValue:
+                            "Aggiungi almeno una spesa per vedere il grafico per categoria.",
+                        })
+                      )
+                    }
+                  >
+                    <CategoriesBreakdownCard items={dashboard.categories} hideHeader noCard />
+                  </SectionAccordion>
+                );
+              }
+              return (
+                <SectionAccordion
+                  key={sectionId}
+                  title={t("dashboard.section.recurrences")}
+                  open={sectionStates.prossimi}
+                  onToggle={() => handleToggleSection("prossimi")}
+                  locked={!isAvailable}
+                  lockedSubtitle={lockedSubtitle}
+                  onLockedPress={() =>
+                    handleLockedPress(
+                      t("dashboard.locked.recurrences", {
+                        defaultValue:
+                          "Aggiungi entrate o uscite ricorrenti per vedere i prossimi movimenti.",
+                      })
+                    )
+                  }
+                >
+                  <RecurrencesTableCard
+                    rows={dashboard.recurrences}
+                    hideHeader
+                    noCard
+                    onPressRow={(row) =>
+                      navigation.navigate("Balance", {
+                        entryType: row.type,
+                        formMode: "edit",
+                        entryId: row.entryId,
+                      })
+                    }
+                  />
+                </SectionAccordion>
+              );
+            })}
           </>
         ) : null}
         </ScrollView>
@@ -407,10 +561,12 @@ const styles = StyleSheet.create({
   },
   greetingRow: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: "flex-end",
     flexWrap: "wrap",
     gap: 12,
+  },
+  rangeRow: {
+    alignItems: "flex-end",
   },
   privacyActions: {
     flexDirection: "row",
@@ -437,9 +593,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
     paddingVertical: 0,
   },
+  cardTitleBlock: {
+    flex: 1,
+    minWidth: 0,
+    gap: 4,
+  },
   accordionTitle: {
     fontSize: 16,
     fontWeight: "600",
+  },
+  lockedSubtitle: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   accordionIcon: {
     fontSize: 24,
@@ -454,7 +619,7 @@ const styles = StyleSheet.create({
     paddingBottom: 0,
   },
   greetingText: {
-    fontSize: 29,
+    fontSize: 34,
     fontWeight: "700",
     letterSpacing: 0.25,
     flexShrink: 1,
@@ -467,5 +632,8 @@ const styles = StyleSheet.create({
   },
   errorBody: {
     marginTop: 6,
+  },
+  lockedCard: {
+    opacity: 0.7,
   },
 });

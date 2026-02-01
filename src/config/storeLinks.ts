@@ -1,23 +1,31 @@
 import { Linking, Platform } from "react-native";
+import i18n from "i18next";
 
-const IOS_PRO_STORE_URL = "https://apps.apple.com/app/balance-pro/idTODO"; // TODO: replace with actual App Store URL
-const ANDROID_PRO_STORE_URL = "https://play.google.com/store/apps/details?id=com.andrearizzo.balance.pro"; // TODO: replace with actual Play Store URL
+export const PRO_WAITLIST_URL = "https://YOUR_DOMAIN/pro-waitlist";
 
-const PRO_STORE_LINKS = {
-  ios: IOS_PRO_STORE_URL,
-  android: ANDROID_PRO_STORE_URL,
-};
+function resolveLocaleParam(): "it" | "en" {
+  const language = i18n.resolvedLanguage ?? i18n.language ?? "it";
+  const normalized = String(language).toLowerCase();
+  return normalized.startsWith("en") ? "en" : "it";
+}
 
-export async function openProStoreLink(): Promise<void> {
-  const url = Platform.OS === "android" ? PRO_STORE_LINKS.android : PRO_STORE_LINKS.ios;
-  if (!url) {
-    throw new Error("Store link missing");
-  }
+function buildProWaitlistUrl(): string {
+  const locale = resolveLocaleParam();
+  const params = [
+    "src=app",
+    "screen=wallet_limit",
+    "variant=free",
+    `platform=${Platform.OS}`,
+    `locale=${locale}`,
+  ].join("&");
+  return `${PRO_WAITLIST_URL}?${params}`;
+}
 
+export async function openProWaitlistLink(): Promise<void> {
+  const url = buildProWaitlistUrl();
   const canOpen = await Linking.canOpenURL(url);
   if (!canOpen) {
-    throw new Error("Unsupported store URL");
+    throw new Error("Unsupported waitlist URL");
   }
-
   await Linking.openURL(url);
 }

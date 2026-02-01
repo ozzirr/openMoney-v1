@@ -11,6 +11,9 @@ export async function getExpenseEntry(id: number): Promise<ExpenseEntry | null> 
 }
 
 export async function createExpenseEntry(entry: Omit<ExpenseEntry, "id">): Promise<number> {
+  if (!entry.expense_category_id || entry.expense_category_id <= 0) {
+    throw new Error("CATEGORY_REQUIRED");
+  }
   const result = await executeSql(
     `INSERT INTO expense_entries (name, amount, start_date, recurrence_frequency, recurrence_interval, one_shot, note, active, wallet_id, expense_category_id)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)` ,
@@ -31,6 +34,9 @@ export async function createExpenseEntry(entry: Omit<ExpenseEntry, "id">): Promi
 }
 
 export async function updateExpenseEntry(id: number, entry: Omit<ExpenseEntry, "id">): Promise<void> {
+  if (!entry.expense_category_id || entry.expense_category_id <= 0) {
+    throw new Error("CATEGORY_REQUIRED");
+  }
   await executeSql(
     `UPDATE expense_entries
      SET name = ?, amount = ?, start_date = ?, recurrence_frequency = ?, recurrence_interval = ?, one_shot = ?, note = ?, active = ?, wallet_id = ?, expense_category_id = ?

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from "react-native";
 import { Button, Switch, Text, TextInput } from "react-native-paper";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -298,7 +298,10 @@ export default function EntriesScreen(): JSX.Element {
       name: entry.name,
       amount: String(entry.amount),
       startDate: entry.start_date,
-      categoryId: "expense_category_id" in entry ? String(entry.expense_category_id) : "",
+      categoryId:
+        "expense_category_id" in entry && entry.expense_category_id
+          ? String(entry.expense_category_id)
+          : "",
       active: entry.active === 1,
       recurring: entry.recurrence_frequency !== null && entry.one_shot === 0,
       frequency: entry.recurrence_frequency ?? "MONTHLY",
@@ -326,6 +329,11 @@ export default function EntriesScreen(): JSX.Element {
 
   const saveEntry = async () => {
     setError(null);
+    if (entryType === "expense" && !isCategorySelected) {
+      setError(t("entries.validation.categoryRequired"));
+      Alert.alert(t("entries.validation.categoryRequired"));
+      return;
+    }
     if (!form.name.trim()) {
       setError(t("entries.validation.nameRequired"));
       return;
@@ -377,7 +385,7 @@ export default function EntriesScreen(): JSX.Element {
       }
     } else {
       const categoryId = Number(form.categoryId);
-      if (!Number.isFinite(categoryId)) {
+      if (!Number.isFinite(categoryId) || categoryId <= 0) {
         setError(t("entries.validation.categoryRequired"));
         return;
       }
@@ -394,9 +402,27 @@ export default function EntriesScreen(): JSX.Element {
         expense_category_id: categoryId,
       };
       if (formMode === "edit") {
-        await updateExpenseEntry(form.id!, payload);
+        try {
+          await updateExpenseEntry(form.id!, payload);
+        } catch (error) {
+          if (error instanceof Error && error.message === "CATEGORY_REQUIRED") {
+            setError(t("entries.validation.categoryRequired"));
+            Alert.alert(t("entries.validation.categoryRequired"));
+            return;
+          }
+          throw error;
+        }
       } else {
-        await createExpenseEntry(payload);
+        try {
+          await createExpenseEntry(payload);
+        } catch (error) {
+          if (error instanceof Error && error.message === "CATEGORY_REQUIRED") {
+            setError(t("entries.validation.categoryRequired"));
+            Alert.alert(t("entries.validation.categoryRequired"));
+            return;
+          }
+          throw error;
+        }
       }
     }
 
@@ -493,6 +519,7 @@ export default function EntriesScreen(): JSX.Element {
   };
 
   const openCategorySection = useCallback(() => {
+    setExpandedCategoryId(null);
     setShowAddCategory(true);
     requestAnimationFrame(() => {
       scrollRef.current?.scrollTo({ y: Math.max(categoriesOffsetY.current - 16, 0), animated: true });
@@ -554,6 +581,10 @@ export default function EntriesScreen(): JSX.Element {
   const shouldShowCategoryFilter =
     entryType === "expense" && entries.length >= 5 && expenseCategoryCount >= 2;
   const canSubmitNewCategory = showAddCategory && newCategory.trim().length > 0;
+  const categoryIdNumber = Number(form.categoryId);
+  const isCategorySelected = entryType !== "expense" || (Number.isFinite(categoryIdNumber) && categoryIdNumber > 0);
+  const shouldShowCategoryHint = entryType === "expense" && !isCategorySelected;
+  const isSaveDisabled = entryType === "expense" && !isCategorySelected;
   const newEntryTitle =
     entryType === "income"
       ? t("entries.form.newIncomeTitle", { defaultValue: "Nuova voce in entrata" })
@@ -726,7 +757,9 @@ export default function EntriesScreen(): JSX.Element {
                       return (
                         <Pressable
                           key={cat.id}
-                          onPress={() => setForm((prev) => ({ ...prev, categoryId: String(cat.id) }))}
+                          onPress={() => {
+                            setForm((prev) => ({ ...prev, categoryId: String(cat.id) }));
+                          }}
                           style={[
                             styles.categoryChip,
                             {
@@ -740,6 +773,11 @@ export default function EntriesScreen(): JSX.Element {
                       );
                     })}
                   </ScrollView>
+                  {shouldShowCategoryHint ? (
+                    <Text style={[styles.categoryHint, { color: tokens.colors.expense }]}>
+                      {t("entries.form.categoryHint", { defaultValue: "Seleziona una categoria." })}
+                    </Text>
+                  ) : null}
                 </View>
               )}
 
@@ -767,7 +805,14 @@ export default function EntriesScreen(): JSX.Element {
               {error && <Text style={{ color: tokens.colors.expense }}>{error}</Text>}
 
               <View style={styles.actionsRow}>
-                <Button mode="contained" buttonColor={entryAccent} textColor="#0B0B0B" onPress={saveEntry} style={styles.flex}>
+                <Button
+                  mode="contained"
+                  buttonColor={entryAccent}
+                  textColor="#0B0B0B"
+                  onPress={saveEntry}
+                  disabled={isSaveDisabled}
+                  style={styles.flex}
+                >
                   {t("common.save")}
                 </Button>
                 <Button mode="outlined" textColor={tokens.colors.text} onPress={() => setForm(emptyForm)} style={styles.flex}>
@@ -954,6 +999,7 @@ export default function EntriesScreen(): JSX.Element {
                     setNewCategoryColor(presetColors[0]);
                     return;
                   }
+                  setExpandedCategoryId(null);
                   setShowAddCategory(true);
                 }}
                 color={tokens.colors.accent}
@@ -1073,6 +1119,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   categoryLink: {
+    fontWeight: "600",
+  },
+  categoryHint: {
+    fontSize: 12,
     fontWeight: "600",
   },
   filterRow: {
