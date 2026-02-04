@@ -347,12 +347,17 @@ function buildDistribution(latestLines: SnapshotLineDetail[], wallets: Wallet[])
     }));
 }
 
-function buildCashflow(income: IncomeEntry[], expense: ExpenseEntry[]): CashflowMonth[] {
+function buildCashflow(
+  income: IncomeEntry[],
+  expense: ExpenseEntry[],
+  monthsToShow: number
+): CashflowMonth[] {
   const now = new Date();
   const months: CashflowMonth[] = [];
+  const totalMonths = Math.min(12, Math.max(3, Math.floor(monthsToShow)));
   let year = now.getFullYear();
   let month = now.getMonth() + 1;
-  for (let i = 0; i < 3; i += 1) {
+  for (let i = 0; i < totalMonths; i += 1) {
     const totals = totalsForMonth(income, expense, year, month);
     months.unshift({
       month: toMonthKey(year, month),
@@ -467,13 +472,13 @@ export function buildDashboardData(
     input.snapshotLines
   );
   const distributions = buildDistribution(input.latestLines, input.wallets);
-  const cashflowMonths = buildCashflow(input.incomeEntries, input.expenseEntries);
+  const cashflowMonths = buildCashflow(input.incomeEntries, input.expenseEntries, input.chartPoints);
   const averages = averageMonthlyTotals(
     input.incomeEntries,
     input.expenseEntries,
     new Date().getFullYear(),
     new Date().getMonth() + 1,
-    6
+    input.chartPoints
   );
   return {
     kpis,

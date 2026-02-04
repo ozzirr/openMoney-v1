@@ -214,6 +214,7 @@ export default function PortfolioLineChartCard({
   const padding = range === 0 ? Math.max(highestValue * 0.05, 1) : range * 0.15;
   const domainMin = Math.max(0, lowestValue - padding);
   const domainMax = highestValue > 0 ? highestValue + padding : 1;
+  const chartHeight = 260;
 
   const visibleWidth = Math.max(width - 64, 0);
   const pointSpacing = 70;
@@ -296,23 +297,26 @@ export default function PortfolioLineChartCard({
         >
           <VictoryChart
             width={chartWidth}
-            height={260}
+            height={chartHeight}
             padding={{ left: chartPaddingLeft, right: chartPaddingRight, top: 18, bottom: 30 }}
             domain={{ y: [domainMin, domainMax] }}
             containerComponent={
               <VictoryVoronoiContainer
                 voronoiBlacklist={displaySeries.map((series) => `area-${series.id}`)}
                 labels={({ datum }) => {
-                  const base = `${formatMonthLabel(String(datum.x))} • ${formatEUR(datum.y)}`;
-                  return datum.walletName ? `${datum.walletName} • ${base}` : base;
+                  const valueLabel = formatEUR(datum.y);
+                  return `${valueLabel}`;
                 }}
                 labelComponent={
                   <VictoryTooltip
-                    flyoutStyle={{ fill: tokens.colors.surface2, stroke: tokens.colors.border }}
+                    renderInPortal={false}
+                    constrainToVisibleArea
+                    flyoutStyle={{ fill: tokens.colors.surface2, stroke: tokens.colors.border, strokeWidth: 1 }}
                     style={{ fill: tokens.colors.text, fontSize: 13, fontWeight: "600" }}
-                    cornerRadius={12}
-                    pointerLength={8}
-                    flyoutPadding={{ top: 8, bottom: 8, left: 12, right: 12 }}
+                    cornerRadius={14}
+                    pointerLength={0}
+                    flyoutPadding={{ top: 6, bottom: 6, left: 10, right: 10 }}
+                    dy={-12}
                   />
                 }
               />
@@ -328,7 +332,7 @@ export default function PortfolioLineChartCard({
             <VictoryAxis
               dependentAxis
               orientation="right"
-                  tickFormat={(tick) => formatCompact(Number(tick))}
+              tickFormat={(tick) => formatCompact(Number(tick))}
               style={{
                 axis: { stroke: "transparent" },
                 grid: { stroke: tokens.colors.border },

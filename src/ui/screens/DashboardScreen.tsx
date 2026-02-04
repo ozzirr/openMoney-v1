@@ -435,12 +435,12 @@ export default function DashboardScreen(): JSX.Element {
     Platform.OS === "android"
       ? tokens.colors.surface2
       : isDark
-      ? "rgba(15, 18, 30, 0.55)"
-      : "rgba(169, 124, 255, 0.32)";
+      ? "rgba(15, 18, 30, 0.78)"
+      : "rgba(169, 124, 255, 0.5)";
   const reorderSheetBorder =
     Platform.OS === "android" ? tokens.colors.border : isDark ? tokens.colors.border : "rgba(169, 124, 255, 0.5)";
   const reorderBlurIntensity = 35;
-  const reorderOverlayTint = isDark ? "rgba(0,0,0,0.28)" : "rgba(0,0,0,0.18)";
+  const reorderOverlayTint = isDark ? "rgba(0,0,0,0.92)" : "rgba(0,0,0,0.8)";
 
   const handleLockedPress = useCallback(
     (message: string) => {

@@ -1,11 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Animated, Platform, Pressable, StyleSheet, View } from "react-native";
+import React, { useCallback, useMemo } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { useTranslation } from "react-i18next";
-import GlassBlur from "@/ui/components/GlassBlur";
-import { useIsFocused } from "@react-navigation/native";
 
 type Option<T extends string> = { value: T; label: string };
 
@@ -16,7 +14,6 @@ type Props<T extends string> = {
   showLabel?: boolean;
   label?: string;
   accessibilityLabel?: string;
-  dropdownMinWidth?: number;
 };
 
 export default function RangeSelector({
@@ -26,94 +23,25 @@ export default function RangeSelector({
   showLabel = true,
   label,
   accessibilityLabel,
-  dropdownMinWidth,
 }: Props<string>): JSX.Element {
-  const { tokens, isDark } = useDashboardTheme();
+  const { tokens } = useDashboardTheme();
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const isFocused = useIsFocused();
-  const [triggerSize, setTriggerSize] = useState({ width: 0, height: 0 });
-  const anim = useRef(new Animated.Value(0)).current;
   const selectedLabel = useMemo(
     () => options.find((opt) => opt.value === selectedRange)?.label ?? "",
     [options, selectedRange]
   );
-  const dropdownBackground =
-    Platform.OS === "android" ? tokens.colors.surface2 : tokens.colors.modalGlassBg;
-  const dropdownBorder =
-    Platform.OS === "android" ? tokens.colors.border : tokens.colors.modalBorder;
-  const resolvedDropdownMinWidth = dropdownMinWidth ?? 168;
-
-  const openSheet = useCallback(() => {
-    setOpen(true);
-    requestAnimationFrame(() => {
-      Animated.timing(anim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }).start();
-    });
-  }, [anim]);
-
-  const closeSheet = useCallback(() => {
-    Animated.timing(anim, {
-      toValue: 0,
-      duration: 180,
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (finished) {
-        setOpen(false);
-      }
-    });
-  }, [anim]);
-
-  const toggleSheet = useCallback(() => {
-    if (open) {
-      closeSheet();
-      return;
-    }
-    openSheet();
-  }, [closeSheet, open, openSheet]);
-
-  useEffect(() => {
-    if (!isFocused && open) {
-      closeSheet();
-    }
-  }, [closeSheet, isFocused, open]);
-
-  const dropdownStyle = {
-    opacity: anim,
-    transform: [
-      {
-        translateY: anim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [-6, 0],
-        }),
-      },
-      {
-        scaleY: anim.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0.92, 1],
-        }),
-      },
-    ],
-  };
-  const dropdownTop = triggerSize.height + 6;
-  const dropdownWidth = Math.max(resolvedDropdownMinWidth, triggerSize.width);
+  const cycleRange = useCallback(() => {
+    if (options.length === 0) return;
+    const currentIndex = options.findIndex((opt) => opt.value === selectedRange);
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % options.length : 0;
+    onChangeRange(options[nextIndex].value);
+  }, [onChangeRange, options, selectedRange]);
 
   return (
     <>
-      <View
-        style={styles.wrapper}
-        onLayout={(event) =>
-          setTriggerSize({
-            width: event.nativeEvent.layout.width,
-            height: event.nativeEvent.layout.height,
-          })
-        }
-      >
+      <View style={styles.wrapper}>
         <Pressable
-          onPress={toggleSheet}
+          onPress={cycleRange}
           hitSlop={6}
           style={({ pressed }) => [
             styles.selectorRow,
@@ -127,7 +55,6 @@ export default function RangeSelector({
             defaultValue: "Seleziona intervallo KPI",
           })
         }
-        accessibilityState={{ expanded: open }}
       >
         {showLabel ? (
           <Text style={[styles.selectorLabel, { color: tokens.colors.muted }]}>
@@ -146,72 +73,10 @@ export default function RangeSelector({
             >
               {selectedLabel}
             </Text>
-            <MaterialCommunityIcons name="chevron-down" size={18} color={tokens.colors.accent} />
+            <MaterialCommunityIcons name="chevron-right" size={18} color={tokens.colors.accent} />
           </View>
         </Pressable>
       </View>
-      {open ? (
-        <Animated.View
-          pointerEvents="auto"
-          style={[
-            styles.dropdown,
-            {
-              top: dropdownTop,
-              right: 0,
-              backgroundColor: dropdownBackground,
-              borderColor: dropdownBorder,
-              width: dropdownWidth,
-            },
-            dropdownStyle,
-          ]}
-        >
-          <GlassBlur intensity={35} tint={isDark ? "dark" : "light"} fallbackColor="transparent" />
-          {options.map((option, index) => {
-            const selected = option.value === selectedRange;
-            const isLast = index === options.length - 1;
-            return (
-              <Pressable
-                key={option.value}
-                onPress={() => {
-                  onChangeRange(option.value);
-                  closeSheet();
-                }}
-                hitSlop={6}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
-                style={({ pressed }) => [
-                  styles.dropdownRow,
-                  {
-                    borderColor: tokens.colors.glassBorder,
-                    backgroundColor: selected
-                      ? `${tokens.colors.accent}22`
-                      : pressed
-                      ? `${tokens.colors.glassBorder}33`
-                      : "transparent",
-                    borderBottomWidth: isLast ? 0 : 1,
-                  },
-                ]}
-              >
-                <Text
-                  style={[styles.dropdownLabel, { color: tokens.colors.text }]}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {option.label}
-                </Text>
-                {selected ? (
-                  <MaterialCommunityIcons
-                    name="check"
-                    size={18}
-                    color={tokens.colors.accent}
-                    style={styles.checkIcon}
-                  />
-                ) : null}
-              </Pressable>
-            );
-          })}
-        </Animated.View>
-      ) : null}
     </>
   );
 }
@@ -256,34 +121,5 @@ const styles = StyleSheet.create({
   },
   selectorValueTextCompact: {
     fontSize: 13,
-  },
-  dropdown: {
-    position: "absolute",
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingVertical: 4,
-    overflow: "hidden",
-    zIndex: 2,
-  },
-  dropdownRow: {
-    position: "relative",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 40,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    borderWidth: 0,
-  },
-  dropdownLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-    flex: 1,
-  },
-  checkIcon: {
-    position: "absolute",
-    right: 12,
   },
 });

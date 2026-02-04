@@ -103,13 +103,13 @@ export default function LimitReachedModal({
   };
 
   const iconTint = `${tokens.colors.accentPurple}22`;
-  const overlayTint = isDark ? "rgba(0,0,0,0.28)" : "rgba(0,0,0,0.18)";
+  const overlayTint = isDark ? "rgba(0,0,0,0.92)" : "rgba(0,0,0,0.8)";
   const cardBackground =
     Platform.OS === "android"
       ? tokens.colors.surface2
       : isDark
-      ? "rgba(15, 18, 30, 0.55)"
-      : "rgba(169, 124, 255, 0.32)";
+      ? "rgba(15, 18, 30, 0.78)"
+      : "rgba(169, 124, 255, 0.5)";
   const cardBorder =
     Platform.OS === "android" ? tokens.colors.border : isDark ? "rgba(255,255,255,0.12)" : "rgba(169, 124, 255, 0.5)";
   const blurTint = isDark ? "dark" : "light";

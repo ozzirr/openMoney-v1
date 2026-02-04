@@ -253,8 +253,8 @@ export default function App(): JSX.Element {
                                     tabBar={(props) => <GlassTabBar {...props} />}
                                   >
                                     <Tab.Screen name="Dashboard" component={DashboardScreen} />
-                                    <Tab.Screen name="Wallet" component={WalletScreen} />
                                     <Tab.Screen name="Snapshot" component={SnapshotScreen} />
+                                    <Tab.Screen name="Wallet" component={WalletScreen} />
                                     <Tab.Screen
                                       name="Balance"
                                       component={EntriesScreen}
