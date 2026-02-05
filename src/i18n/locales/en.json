@@ -184,6 +184,17 @@
         "last12Months": "Last 12 months"
       }
     },
+    "locked": {
+      "title": "How to unlock it",
+      "subtitle": "No data available.",
+      "trend": "Add at least 2 snapshots on different dates to see the trend over time.",
+      "distribution": "Add your first snapshot to see the portfolio distribution.",
+      "cashflow": "Add recurring incomes and/or expenses to enable Cash Flow.",
+      "categories": "Add at least one expense to see the category chart.",
+      "recurrences": "Add recurring incomes or expenses to see upcoming movements.",
+      "ctaSnapshot": "Add snapshot",
+      "ctaBalance": "Go to Balance"
+    },
     "reorder": {
       "edit": "Edit order",
       "title": "Edit order",

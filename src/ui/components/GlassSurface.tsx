@@ -59,15 +59,17 @@ export default function GlassSurface({
         style,
       ]}
     >
-      {Platform.OS === "ios" ? (
-        <BlurView
-          intensity={intensity}
-          tint={resolvedTint}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
-      ) : null}
-      {children}
+      <View style={[styles.clip, { borderRadius: resolvedRadius }]}>
+        {Platform.OS === "ios" ? (
+          <BlurView
+            intensity={intensity}
+            tint={resolvedTint}
+            style={StyleSheet.absoluteFill}
+            pointerEvents="none"
+          />
+        ) : null}
+        {children}
+      </View>
     </View>
   );
 }
@@ -75,6 +77,8 @@ export default function GlassSurface({
 const styles = StyleSheet.create({
   base: {
     borderWidth: 1,
+  },
+  clip: {
     overflow: "hidden",
   },
 });

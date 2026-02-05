@@ -165,7 +165,6 @@ const styles = StyleSheet.create({
   actionButton: {
     flex: 1,
     borderRadius: 999,
-    overflow: "hidden",
   },
   actionPrimary: {
     borderRadius: 999,

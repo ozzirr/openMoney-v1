@@ -184,6 +184,17 @@
         "last12Months": "Últimos 12 meses"
       }
     },
+    "locked": {
+      "title": "Como desbloquear",
+      "subtitle": "Nenhum dado disponível.",
+      "trend": "Adiciona pelo menos 2 snapshots em datas diferentes para ver a evolução no tempo.",
+      "distribution": "Adiciona o teu primeiro snapshot para ver a distribuição do património.",
+      "cashflow": "Adiciona entradas e/ou despesas recorrentes para ativar o Cash Flow.",
+      "categories": "Adiciona pelo menos uma despesa para ver o gráfico por categoria.",
+      "recurrences": "Adiciona entradas ou despesas recorrentes para ver os próximos movimentos.",
+      "ctaSnapshot": "Adicionar snapshot",
+      "ctaBalance": "Ir para Balance"
+    },
     "reorder": {
       "edit": "Editar ordem",
       "title": "Editar ordem",

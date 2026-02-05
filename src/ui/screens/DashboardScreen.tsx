@@ -38,6 +38,7 @@ import PressScale from "@/ui/dashboard/components/PressScale";
 import Skeleton from "@/ui/dashboard/components/Skeleton";
 import PremiumCard from "@/ui/dashboard/components/PremiumCard";
 import AppBackground from "@/ui/components/AppBackground";
+import LimitReachedModal from "@/ui/components/LimitReachedModal";
 import { GlassCardContainer, SmallOutlinePillButton } from "@/ui/components/EntriesUI";
 import CoachTipCard from "@/ui/components/CoachTipCard";
 import GlassBlur from "@/ui/components/GlassBlur";
@@ -157,6 +158,11 @@ export default function DashboardScreen(): JSX.Element {
     prossimi: true,
   });
   const [orderedSections, setOrderedSections] = useState<SectionId[]>(SECTION_ORDER);
+  const [lockedModal, setLockedModal] = useState<{
+    visible: boolean;
+    sectionId: SectionId | null;
+    message: string;
+  }>({ visible: false, sectionId: null, message: "" });
   const { t } = useTranslation();
   const { showInvestments } = useSettings();
   const kpiRangeOptions = useMemo(() => {
@@ -442,16 +448,47 @@ export default function DashboardScreen(): JSX.Element {
   const reorderBlurIntensity = 35;
   const reorderOverlayTint = isDark ? "rgba(0,0,0,0.92)" : "rgba(0,0,0,0.8)";
 
-  const handleLockedPress = useCallback(
-    (message: string) => {
-      Alert.alert(
-        t("dashboard.locked.title", { defaultValue: "Come sbloccarla" }),
-        message,
-        [{ text: t("common.close", { defaultValue: "Chiudi" }) }]
-      );
-    },
-    [t]
-  );
+  const handleLockedPress = useCallback((sectionId: SectionId, message: string) => {
+    setLockedModal({ visible: true, sectionId, message });
+  }, []);
+
+  const closeLockedModal = useCallback(() => {
+    setLockedModal((prev) => ({ ...prev, visible: false }));
+  }, []);
+
+  const lockedCta = useMemo(() => {
+    if (!lockedModal.sectionId) {
+      return {
+        label: t("common.close", { defaultValue: "Chiudi" }),
+        onPress: closeLockedModal,
+      };
+    }
+    if (lockedModal.sectionId === "andamento" || lockedModal.sectionId === "distribuzione") {
+      return {
+        label: t("dashboard.locked.ctaSnapshot", { defaultValue: "Aggiungi snapshot" }),
+        onPress: () => {
+          closeLockedModal();
+          navigation.navigate("Snapshot", { openNew: true });
+        },
+      };
+    }
+    if (lockedModal.sectionId === "categories") {
+      return {
+        label: t("dashboard.locked.ctaBalance", { defaultValue: "Vai a Balance" }),
+        onPress: () => {
+          closeLockedModal();
+          navigation.navigate("Balance", { entryType: "expense" });
+        },
+      };
+    }
+    return {
+      label: t("dashboard.locked.ctaBalance", { defaultValue: "Vai a Balance" }),
+      onPress: () => {
+        closeLockedModal();
+        navigation.navigate("Balance");
+      },
+    };
+  }, [closeLockedModal, lockedModal.sectionId, navigation, t]);
 
   const skeleton = useMemo(
     () => (
@@ -477,50 +514,50 @@ export default function DashboardScreen(): JSX.Element {
           ]}
           showsVerticalScrollIndicator={false}
         >
-        {loading && !dashboard && skeleton}
+          {loading && !dashboard && skeleton}
 
-        {error && !loading ? (
-      <PremiumCard>
-        <Text style={[styles.errorTitle, { color: tokens.colors.text }]}>{t("dashboard.errorTitle")}</Text>
-            <Text style={[styles.errorBody, { color: tokens.colors.muted }]}>{error}</Text>
-          </PremiumCard>
-        ) : null}
+          {error && !loading ? (
+            <PremiumCard>
+              <Text style={[styles.errorTitle, { color: tokens.colors.text }]}>{t("dashboard.errorTitle")}</Text>
+              <Text style={[styles.errorBody, { color: tokens.colors.muted }]}>{error}</Text>
+            </PremiumCard>
+          ) : null}
 
-        {emptyState ? (
-          <CoachTipCard
-            lines={[t("dashboard.emptyBody")]}
-            ctaLabel={t("dashboard.emptyCta", { defaultValue: "Configura Balance" })}
-            onPress={() => navigation.navigate("Wallet", { startSetup: true })}
-            ctaColor={tokens.colors.accent}
-          />
-        ) : null}
+          {emptyState ? (
+            <CoachTipCard
+              lines={[t("dashboard.emptyBody")]}
+              ctaLabel={t("dashboard.emptyCta", { defaultValue: "Configura Balance" })}
+              onPress={() => navigation.navigate("Wallet", { startSetup: true })}
+              ctaColor={tokens.colors.accent}
+            />
+          ) : null}
 
-        {dashboard ? (
-          <>
-            <View style={styles.greetingBlock}>
-              <View style={styles.greetingRow}>
-                <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
-                  {profileName
-                    ? t("dashboard.greetingWithName", { name: profileName })
-                    : t("dashboard.greeting")}
-                </Text>
+          {dashboard ? (
+            <>
+              <View style={styles.greetingBlock}>
+                <View style={styles.greetingRow}>
+                  <Text style={[styles.greetingText, { color: tokens.colors.text }]}>
+                    {profileName
+                      ? t("dashboard.greetingWithName", { name: profileName })
+                      : t("dashboard.greeting")}
+                  </Text>
+                </View>
+                <View style={styles.kpiBlock}>
+                  <KPIStrip items={dashboard.kpis} />
+                  {kpiRangeOptions.length > 1 ? (
+                    <View style={styles.rangeRow}>
+                      <RangeSelector
+                        selectedRange={kpiDeltaRange}
+                        onChangeRange={setKpiDeltaRange}
+                        options={kpiRangeOptions}
+                        showLabel={false}
+                      />
+                    </View>
+                  ) : null}
+                </View>
               </View>
-              <View style={styles.kpiBlock}>
-                <KPIStrip items={dashboard.kpis} />
-                {kpiRangeOptions.length > 1 ? (
-                  <View style={styles.rangeRow}>
-                    <RangeSelector
-                      selectedRange={kpiDeltaRange}
-                      onChangeRange={setKpiDeltaRange}
-                      options={kpiRangeOptions}
-                      showLabel={false}
-                    />
-                  </View>
-                ) : null}
-              </View>
-            </View>
-            {showPrivacyCard && (
-              <CoachTipCard
+              {showPrivacyCard && (
+                <CoachTipCard
                 leadingIcon={<MaterialCommunityIcons name="shield-lock-outline" size={20} color={tokens.colors.accent} />}
                 title={t("dashboard.privacy.title")}
                 lines={[t("dashboard.privacy.body")]}
@@ -539,13 +576,13 @@ export default function DashboardScreen(): JSX.Element {
                     </PressScale>
                   </View>
                 }
-              />
-            )}
+                />
+              )}
 
-            {orderedSections.map((sectionId) => {
-              const isAvailable = sectionAvailability[sectionId];
-              if (sectionId === "andamento") {
-                return (
+              {orderedSections.map((sectionId) => {
+                const isAvailable = sectionAvailability[sectionId];
+                if (sectionId === "andamento") {
+                  return (
                   <SectionAccordion
                     key={sectionId}
                     title={t("dashboard.section.trend")}
@@ -555,6 +592,7 @@ export default function DashboardScreen(): JSX.Element {
                     lockedSubtitle={lockedSubtitle}
                     onLockedPress={() =>
                       handleLockedPress(
+                        "andamento",
                         t("dashboard.locked.trend", {
                           defaultValue:
                             "Aggiungi almeno 2 snapshot in date diverse per vedere l’andamento nel tempo.",
@@ -583,6 +621,7 @@ export default function DashboardScreen(): JSX.Element {
                     lockedSubtitle={lockedSubtitle}
                     onLockedPress={() =>
                       handleLockedPress(
+                        "distribuzione",
                         t("dashboard.locked.distribution", {
                           defaultValue:
                             "Aggiungi il tuo primo snapshot per vedere la distribuzione del patrimonio.",
@@ -605,6 +644,7 @@ export default function DashboardScreen(): JSX.Element {
                     lockedSubtitle={lockedSubtitle}
                     onLockedPress={() =>
                       handleLockedPress(
+                        "cashflow",
                         t("dashboard.locked.cashflow", {
                           defaultValue:
                             "Inserisci entrate e/o uscite ricorrenti per attivare il Cash Flow.",
@@ -627,6 +667,7 @@ export default function DashboardScreen(): JSX.Element {
                     lockedSubtitle={lockedSubtitle}
                     onLockedPress={() =>
                       handleLockedPress(
+                        "categories",
                         t("dashboard.locked.categories", {
                           defaultValue:
                             "Aggiungi almeno una spesa per vedere il grafico per categoria.",
@@ -648,6 +689,7 @@ export default function DashboardScreen(): JSX.Element {
                   lockedSubtitle={lockedSubtitle}
                   onLockedPress={() =>
                     handleLockedPress(
+                      "prossimi",
                       t("dashboard.locked.recurrences", {
                         defaultValue:
                           "Aggiungi entrate o uscite ricorrenti per vedere i prossimi movimenti.",
@@ -669,18 +711,18 @@ export default function DashboardScreen(): JSX.Element {
                   />
                 </SectionAccordion>
               );
-            })}
-            {canReorderSections && (
-              <View style={styles.orderToggleRow}>
-                <PressScale onPress={openReorderSheet} style={styles.orderToggleLink}>
-                  <Text style={[styles.orderToggleText, { color: tokens.colors.accent }]}>
-                    {t("dashboard.reorder.edit", { defaultValue: "Modifica ordine" })}
-                  </Text>
-                </PressScale>
-              </View>
-            )}
-          </>
-        ) : null}
+              })}
+              {canReorderSections && (
+                <View style={styles.orderToggleRow}>
+                  <PressScale onPress={openReorderSheet} style={styles.orderToggleLink}>
+                    <Text style={[styles.orderToggleText, { color: tokens.colors.accent }]}>
+                      {t("dashboard.reorder.edit", { defaultValue: "Modifica ordine" })}
+                    </Text>
+                  </PressScale>
+                </View>
+              )}
+            </>
+          ) : null}
         </ScrollView>
         <Modal
           visible={reorderVisible && canReorderSections}
@@ -759,6 +801,17 @@ export default function DashboardScreen(): JSX.Element {
             </Animated.View>
           </View>
         </Modal>
+        <LimitReachedModal
+          visible={lockedModal.visible}
+          onClose={closeLockedModal}
+          onUpgrade={lockedCta.onPress}
+          title={t("dashboard.locked.title", { defaultValue: "Come sbloccarla" })}
+          subtitle={lockedModal.message}
+          ctaLabel={lockedCta.label}
+          secondaryLabel={t("common.close", { defaultValue: "Chiudi" })}
+          benefits={[]}
+          iconName="lock-outline"
+        />
       </AppBackground>
     </View>
   );

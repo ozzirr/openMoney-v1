@@ -14,6 +14,8 @@ type Props = {
   subtitle?: string;
   benefits?: string[];
   ctaLabel?: string;
+  secondaryLabel?: string;
+  iconName?: string;
 };
 
 const LinearGradient: React.ComponentType<any> | undefined = undefined;
@@ -26,6 +28,8 @@ export default function LimitReachedModal({
   subtitle,
   benefits,
   ctaLabel,
+  secondaryLabel,
+  iconName,
 }: Props): JSX.Element {
   const { tokens, shadows, isDark } = useDashboardTheme();
   const { t } = useTranslation();
@@ -35,6 +39,8 @@ export default function LimitReachedModal({
 
   const resolvedTitle = title ?? t("wallets.actions.limitModalTitle");
   const resolvedSubtitle = subtitle ?? t("wallets.actions.limitModalSubtitle");
+  const resolvedSecondaryLabel = secondaryLabel ?? t("wallets.actions.limitMaybeLater");
+  const resolvedIconName = iconName ?? "wallet-outline";
   const resolvedBenefits = useMemo(
     () =>
       benefits ?? [
@@ -103,6 +109,7 @@ export default function LimitReachedModal({
   };
 
   const iconTint = `${tokens.colors.accentPurple}22`;
+  const shouldShowBenefits = resolvedBenefits.length > 0;
   const overlayTint = isDark ? "rgba(0,0,0,0.92)" : "rgba(0,0,0,0.8)";
   const cardBackground =
     Platform.OS === "android"
@@ -140,7 +147,7 @@ export default function LimitReachedModal({
           <GlassBlur intensity={blurIntensity} tint={blurTint} fallbackColor="transparent" />
           <View style={[styles.iconWrap, { backgroundColor: iconTint }]}>
             <View style={[styles.iconInner, { backgroundColor: tokens.colors.modalBorder }]}>
-              <MaterialCommunityIcons name="wallet-outline" size={32} color={tokens.colors.accent} />
+              <MaterialCommunityIcons name={resolvedIconName} size={32} color={tokens.colors.accent} />
             </View>
           </View>
           <Text variant="titleLarge" style={[styles.title, { color: tokens.colors.text }]}>
@@ -150,24 +157,26 @@ export default function LimitReachedModal({
             {resolvedSubtitle}
           </Text>
 
-          <View style={styles.benefits}>
-            {resolvedBenefits.map((item) => (
-              <View key={item} style={styles.benefitRow}>
-                <View style={[styles.checkIcon, { backgroundColor: tokens.colors.accentPurple }]}>
-                  <MaterialIcons name="check" size={16} color="#FFFFFF" />
+          {shouldShowBenefits ? (
+            <View style={styles.benefits}>
+              {resolvedBenefits.map((item) => (
+                <View key={item} style={styles.benefitRow}>
+                  <View style={[styles.checkIcon, { backgroundColor: tokens.colors.accentPurple }]}>
+                    <MaterialIcons name="check" size={16} color="#FFFFFF" />
+                  </View>
+                  <Text variant="bodyLarge" style={{ color: tokens.colors.text }}>
+                    {item}
+                  </Text>
                 </View>
-                <Text variant="bodyLarge" style={{ color: tokens.colors.text }}>
-                  {item}
-                </Text>
-              </View>
-            ))}
-          </View>
+              ))}
+            </View>
+          ) : null}
 
           {renderPrimaryCta()}
 
           <Pressable accessibilityRole="button" onPress={onClose} style={styles.secondary}>
             <Text variant="bodyLarge" style={{ color: tokens.colors.accent }}>
-              {t("wallets.actions.limitMaybeLater")}
+              {resolvedSecondaryLabel}
             </Text>
           </Pressable>
         </Animated.View>

@@ -64,67 +64,76 @@ export default function GlassTabBar({ state, descriptors, navigation }: BottomTa
           style={[
             styles.blur,
             {
-              paddingBottom: insets.bottom + 8,
               minHeight: BAR_HEIGHT + insets.bottom,
             },
           ]}
         >
-          <View style={styles.inner}>
-            {tabRoutes.map((route) => {
-              const { options } = descriptors[route.key];
-              const label = options.tabBarLabel ?? options.title ?? route.name;
-              const isFocused = state.index === state.routes.findIndex((r) => r.key === route.key);
-              const onPress = async () => {
-                const event = navigation.emit({
-                  type: "tabPress",
-                  target: route.key,
-                  canPreventDefault: true,
-                });
-                if (event.defaultPrevented) return;
+          <View
+            style={[
+              styles.barContent,
+              {
+                minHeight: BAR_HEIGHT + insets.bottom,
+                paddingBottom: insets.bottom + 8,
+              },
+            ]}
+          >
+            <View style={styles.inner}>
+              {tabRoutes.map((route) => {
+                const { options } = descriptors[route.key];
+                const label = options.tabBarLabel ?? options.title ?? route.name;
+                const isFocused = state.index === state.routes.findIndex((r) => r.key === route.key);
+                const onPress = async () => {
+                  const event = navigation.emit({
+                    type: "tabPress",
+                    target: route.key,
+                    canPreventDefault: true,
+                  });
+                  if (event.defaultPrevented) return;
 
-                if (!isFocused && (route.name === "Snapshot" || route.name === "Balance")) {
-                  try {
-                    const wallets = await listWallets();
-                    if (wallets.length === 0) {
-                      setBlockedModalVisible(true);
-                      return;
+                  if (!isFocused && (route.name === "Snapshot" || route.name === "Balance")) {
+                    try {
+                      const wallets = await listWallets();
+                      if (wallets.length === 0) {
+                        setBlockedModalVisible(true);
+                        return;
+                      }
+                    } catch {
+                      // If check fails, allow navigation to avoid blocking the user.
                     }
-                  } catch {
-                    // If check fails, allow navigation to avoid blocking the user.
                   }
-                }
 
-                if (!isFocused) {
-                  navigation.navigate(route.name);
-                }
-              };
-              const icon = ICONS[route.name] ?? "circle-outline";
+                  if (!isFocused) {
+                    navigation.navigate(route.name);
+                  }
+                };
+                const icon = ICONS[route.name] ?? "circle-outline";
 
-              return (
-                <Pressable
-                  key={route.key}
-                  onPress={onPress}
-                  style={styles.tabItem}
-                >
-                  <MaterialCommunityIcons
-                    name={icon}
-                    size={isFocused ? 28 : 24}
-                    color={isFocused ? theme.colors.primary : inactiveColor}
-                  />
-                  <Text
-                    variant="labelSmall"
-                    style={[
-                      styles.label,
-                      { color: isFocused ? theme.colors.primary : inactiveColor },
-                    ]}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
+                return (
+                  <Pressable
+                    key={route.key}
+                    onPress={onPress}
+                    style={styles.tabItem}
                   >
-                    {String(label)}
-                  </Text>
-                </Pressable>
-              );
-            })}
+                    <MaterialCommunityIcons
+                      name={icon}
+                      size={isFocused ? 28 : 24}
+                      color={isFocused ? theme.colors.primary : inactiveColor}
+                    />
+                    <Text
+                      variant="labelSmall"
+                      style={[
+                        styles.label,
+                        { color: isFocused ? theme.colors.primary : inactiveColor },
+                      ]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {String(label)}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
         </GlassSurface>
       </View>
@@ -153,9 +162,11 @@ const styles = StyleSheet.create({
     minHeight: BAR_HEIGHT,
     overflow: "hidden",
     paddingHorizontal: 16,
-    justifyContent: "center",
     borderWidth: 0,
     borderTopWidth: 1,
+  },
+  barContent: {
+    justifyContent: "center",
   },
   inner: {
     flexDirection: "row",
