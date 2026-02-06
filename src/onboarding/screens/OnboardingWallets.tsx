@@ -7,9 +7,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { OnboardingStackParamList } from "@/onboarding/OnboardingNavigator";
 import { useOnboardingDraft } from "@/onboarding/state/OnboardingContext";
+import { useSettings } from "@/settings/useSettings";
 
 export default function OnboardingWallets(): JSX.Element {
   const { tokens } = useDashboardTheme();
+  const { scrollBounceEnabled } = useSettings();
   const navigation =
     useNavigation<NativeStackNavigationProp<OnboardingStackParamList, "OnboardingWallets">>();
   const {
@@ -35,7 +37,13 @@ export default function OnboardingWallets(): JSX.Element {
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: tokens.colors.bg }]}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        contentContainerStyle={styles.container}
+        keyboardShouldPersistTaps="handled"
+        bounces={scrollBounceEnabled}
+        alwaysBounceVertical={scrollBounceEnabled}
+        overScrollMode={scrollBounceEnabled ? "always" : "never"}
+      >
         <Text style={[styles.title, { color: tokens.colors.text }]}>Wallets</Text>
         <Text style={[styles.subtitle, { color: tokens.colors.muted }]}>
           Scegli dove tieni i soldi e inserisci il tuo primo saldo.

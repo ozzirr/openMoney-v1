@@ -80,7 +80,7 @@ export default function SettingsScreen(): JSX.Element {
   const { mode, setMode } = useContext(ThemeContext);
   const { requestReplay } = useOnboardingFlow();
   const { t, i18n } = useTranslation();
-  const { showInvestments, setShowInvestments } = useSettings();
+  const { showInvestments, setShowInvestments, scrollBounceEnabled, setScrollBounceEnabled } = useSettings();
 
   const currentLanguage = (i18n.resolvedLanguage ?? i18n.language ?? "it") as SupportedLanguage;
   const languageOptions = useMemo(
@@ -371,6 +371,9 @@ export default function SettingsScreen(): JSX.Element {
   return (
     <AppBackground>
       <ScrollView
+        bounces={scrollBounceEnabled}
+        alwaysBounceVertical={scrollBounceEnabled}
+        overScrollMode={scrollBounceEnabled ? "always" : "never"}
         contentContainerStyle={[
           styles.container,
           { gap: tokens.spacing.md, paddingBottom: 160 + insets.bottom, paddingTop: headerHeight + 12 },
@@ -423,6 +426,16 @@ export default function SettingsScreen(): JSX.Element {
                 value={showInvestments}
                 onValueChange={(value) => {
                   void setShowInvestments(value);
+                }}
+                color={tokens.colors.accent}
+              />
+            </View>
+            <View style={styles.row}>
+              <Text style={[styles.label, { color: tokens.colors.text }]}>{t("settings.preferences.scrollBounce")}</Text>
+              <Switch
+                value={scrollBounceEnabled}
+                onValueChange={(value) => {
+                  void setScrollBounceEnabled(value);
                 }}
                 color={tokens.colors.accent}
               />
@@ -491,11 +504,8 @@ export default function SettingsScreen(): JSX.Element {
             <SectionHeader title={t("settings.data.title")} />
             <PrimaryPillButton label={t("settings.data.export")} onPress={exportData} color={tokens.colors.accent} />
             <SmallOutlinePillButton label={t("settings.data.import")} onPress={importData} color={tokens.colors.text} fullWidth />
+            <SmallOutlinePillButton label={t("settings.reset")} onPress={resetData} color={tokens.colors.red} fullWidth />
         </GlassCardContainer>
-
-        <View style={styles.resetContainer}>
-          <SmallOutlinePillButton label={t("settings.reset")} onPress={resetData} color={tokens.colors.red} fullWidth />
-        </View>
       </ScrollView>
     </AppBackground>
   );
@@ -512,10 +522,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
-  resetContainer: {
-    marginTop: 4,
-    marginBottom: 24,
-  },
   row: {
     flexDirection: "row",
     alignItems: "center",

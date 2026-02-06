@@ -7,9 +7,11 @@ import { useNavigation } from "@react-navigation/native";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { OnboardingStackParamList } from "@/onboarding/OnboardingNavigator";
 import { useOnboardingDraft, defaultCategories } from "@/onboarding/state/OnboardingContext";
+import { useSettings } from "@/settings/useSettings";
 
 export default function OnboardingCategories(): JSX.Element {
   const { tokens } = useDashboardTheme();
+  const { scrollBounceEnabled } = useSettings();
   const navigation =
     useNavigation<NativeStackNavigationProp<OnboardingStackParamList, "OnboardingCategories">>();
   const { draft, toggleCategory, addCustomCategory } = useOnboardingDraft();
@@ -50,7 +52,12 @@ export default function OnboardingCategories(): JSX.Element {
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: tokens.colors.bg }]}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        bounces={scrollBounceEnabled}
+        alwaysBounceVertical={scrollBounceEnabled}
+        overScrollMode={scrollBounceEnabled ? "always" : "never"}
+      >
         <Text style={[styles.title, { color: tokens.colors.text }]}>Categorie</Text>
         <Text style={[styles.subtitle, { color: tokens.colors.muted }]}>
           Seleziona le categorie che utilizzerai fin da subito.

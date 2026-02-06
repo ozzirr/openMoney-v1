@@ -133,7 +133,7 @@ export default function SnapshotScreen(): JSX.Element {
   const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
-  const { showInvestments } = useSettings();
+  const { showInvestments, scrollBounceEnabled } = useSettings();
   const { t } = useTranslation();
   const route = useRoute();
   const routeParams = route.params as SnapshotRouteParams | undefined;
@@ -508,12 +508,13 @@ export default function SnapshotScreen(): JSX.Element {
       <AppBackground>
         <ScrollView
           keyboardShouldPersistTaps="handled"
+          bounces={scrollBounceEnabled}
+          alwaysBounceVertical={scrollBounceEnabled}
+          overScrollMode={scrollBounceEnabled ? "always" : "never"}
           contentContainerStyle={[
             styles.container,
             { gap: tokens.spacing.md, paddingBottom: 160 + insets.bottom, paddingTop: headerHeight + 12 },
           ]}
-          alwaysBounceVertical
-          bounces
         >
         {/* Header title/subtitle removed per request */}
 

@@ -33,6 +33,7 @@ import SectionHeader from "@/ui/dashboard/components/SectionHeader";
 import PressScale from "@/ui/dashboard/components/PressScale";
 import { createStandardTextInputProps } from "@/ui/components/standardInputProps";
 import ConfirmDialog from "@/ui/components/ConfirmDialog";
+import { useSettings } from "@/settings/useSettings";
 
 type EntryType = "income" | "expense";
 type FormMode = "create" | "edit";
@@ -182,6 +183,7 @@ const AccordionItem = ({
 
 export default function EntriesScreen(): JSX.Element {
   const { tokens, isDark } = useDashboardTheme();
+  const { scrollBounceEnabled } = useSettings();
   const deleteIconColor = isDark ? tokens.colors.bg : tokens.colors.surface;
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -652,6 +654,9 @@ export default function EntriesScreen(): JSX.Element {
       <AppBackground>
         <ScrollView
           ref={scrollRef}
+          bounces={scrollBounceEnabled}
+          alwaysBounceVertical={scrollBounceEnabled}
+          overScrollMode={scrollBounceEnabled ? "always" : "never"}
           contentContainerStyle={[
             styles.container,
             { gap: tokens.spacing.lg, paddingBottom: 140 + insets.bottom, paddingTop: headerHeight + 12 },
@@ -662,8 +667,8 @@ export default function EntriesScreen(): JSX.Element {
             value={entryType}
             onChange={(next) => setEntryType(next as EntryType)}
             options={[
-              { value: "income", label: t("entries.list.tabIncome"), tint: `${tokens.colors.income}44` },
               { value: "expense", label: t("entries.list.tabExpense"), tint: `${tokens.colors.expense}33` },
+              { value: "income", label: t("entries.list.tabIncome"), tint: `${tokens.colors.income}44` },
             ]}
           />
 

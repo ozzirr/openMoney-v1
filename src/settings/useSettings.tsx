@@ -3,10 +3,14 @@ import { getPreference, setPreference } from "@/repositories/preferencesRepo";
 
 const SHOW_INVESTMENTS_KEY = "settings.showInvestments";
 const DEFAULT_SHOW_INVESTMENTS = true;
+const SCROLL_BOUNCE_KEY = "settings.scrollBounce";
+const DEFAULT_SCROLL_BOUNCE = false;
 
 type SettingsContextValue = {
   showInvestments: boolean;
   setShowInvestments: (next: boolean) => Promise<void>;
+  scrollBounceEnabled: boolean;
+  setScrollBounceEnabled: (next: boolean) => Promise<void>;
 };
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -17,14 +21,20 @@ type SettingsProviderProps = {
 
 export function SettingsProvider({ children }: SettingsProviderProps): JSX.Element {
   const [showInvestments, setShowInvestmentsState] = useState(DEFAULT_SHOW_INVESTMENTS);
+  const [scrollBounceEnabled, setScrollBounceEnabledState] = useState(DEFAULT_SCROLL_BOUNCE);
 
   useEffect(() => {
     let active = true;
     (async () => {
-      const pref = await getPreference(SHOW_INVESTMENTS_KEY);
+      const [investmentsPref, bouncePref] = await Promise.all([
+        getPreference(SHOW_INVESTMENTS_KEY),
+        getPreference(SCROLL_BOUNCE_KEY),
+      ]);
       if (!active) return;
-      const value = pref ? pref.value === "true" : DEFAULT_SHOW_INVESTMENTS;
-      setShowInvestmentsState(value);
+      const investmentsValue = investmentsPref ? investmentsPref.value === "true" : DEFAULT_SHOW_INVESTMENTS;
+      const bounceValue = bouncePref ? bouncePref.value === "true" : DEFAULT_SCROLL_BOUNCE;
+      setShowInvestmentsState(investmentsValue);
+      setScrollBounceEnabledState(bounceValue);
     })();
     return () => {
       active = false;
@@ -36,8 +46,15 @@ export function SettingsProvider({ children }: SettingsProviderProps): JSX.Eleme
     setShowInvestmentsState(next);
   }, []);
 
+  const setScrollBounceEnabled = useCallback(async (next: boolean) => {
+    await setPreference(SCROLL_BOUNCE_KEY, next ? "true" : "false");
+    setScrollBounceEnabledState(next);
+  }, []);
+
   return (
-    <SettingsContext.Provider value={{ showInvestments, setShowInvestments }}>
+    <SettingsContext.Provider
+      value={{ showInvestments, setShowInvestments, scrollBounceEnabled, setScrollBounceEnabled }}
+    >
       {children}
     </SettingsContext.Provider>
   );

@@ -164,7 +164,7 @@ export default function DashboardScreen(): JSX.Element {
     message: string;
   }>({ visible: false, sectionId: null, message: "" });
   const { t } = useTranslation();
-  const { showInvestments } = useSettings();
+  const { showInvestments, scrollBounceEnabled } = useSettings();
   const kpiRangeOptions = useMemo(() => {
     const labels: Record<KpiDeltaRange, string> = {
       "7D": t("dashboard.range.options.last7Days"),
@@ -505,6 +505,9 @@ export default function DashboardScreen(): JSX.Element {
     <View style={styles.screenRoot}>
       <AppBackground>
         <ScrollView
+          bounces={scrollBounceEnabled}
+          alwaysBounceVertical={scrollBounceEnabled}
+          overScrollMode={scrollBounceEnabled ? "always" : "never"}
           contentContainerStyle={[
             styles.container,
             {

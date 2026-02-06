@@ -163,7 +163,7 @@ export default function WalletScreen(): JSX.Element {
   });
   const [reorderVisible, setReorderVisible] = useState(false);
   const reorderAnim = useRef(new Animated.Value(0)).current;
-  const { showInvestments } = useSettings();
+  const { showInvestments, scrollBounceEnabled } = useSettings();
   const [walletEdits, setWalletEdits] = useState<
     Record<number, { name: string; tag: string; currency: Currency; color: string }>
   >({});
@@ -583,12 +583,13 @@ export default function WalletScreen(): JSX.Element {
       <AppBackground>
         <ScrollView
           ref={scrollRef}
+          bounces={scrollBounceEnabled}
+          alwaysBounceVertical={scrollBounceEnabled}
+          overScrollMode={scrollBounceEnabled ? "always" : "never"}
           contentContainerStyle={[
             styles.container,
             { gap: tokens.spacing.md, paddingBottom: 160 + insets.bottom, paddingTop: headerHeight + 12 },
           ]}
-          alwaysBounceVertical
-          bounces
         >
         <GlassCardContainer>
           <View style={styles.sectionContent}>
@@ -962,6 +963,9 @@ export default function WalletScreen(): JSX.Element {
               style={styles.reorderScroll}
               contentContainerStyle={styles.reorderGroups}
               showsVerticalScrollIndicator={false}
+              bounces={scrollBounceEnabled}
+              alwaysBounceVertical={scrollBounceEnabled}
+              overScrollMode={scrollBounceEnabled ? "always" : "never"}
             >
               <View style={styles.reorderList}>
                 {(tab === "INVEST" ? reorderLists.INVEST : reorderLists.LIQUIDITY).map((wallet, index) => (

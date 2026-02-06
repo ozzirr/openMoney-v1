@@ -2,6 +2,7 @@ import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, View } from "react-native";
 import AppBackground from "@/ui/components/AppBackground";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
+import { useSettings } from "@/settings/useSettings";
 
 type Props = {
   children: React.ReactNode;
@@ -11,10 +12,14 @@ export const ONBOARDING_CARD_MIN_HEIGHT = 520;
 
 export default function OnboardingScaffold({ children }: Props): JSX.Element {
   const { tokens } = useDashboardTheme();
+  const { scrollBounceEnabled } = useSettings();
   return (
     <AppBackground>
       <SafeAreaView style={styles.safe}>
         <ScrollView
+          bounces={scrollBounceEnabled}
+          alwaysBounceVertical={scrollBounceEnabled}
+          overScrollMode={scrollBounceEnabled ? "always" : "never"}
           contentContainerStyle={[
             styles.content,
             { padding: tokens.spacing.lg },

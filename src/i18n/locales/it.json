@@ -82,6 +82,7 @@
       "darkTheme": "Tema scuro",
       "prefillSnapshot": "Precompila snapshot",
       "showInvestments": "Mostra investimenti",
+      "scrollBounce": "Rimbalzo scroll",
       "monthsInChart": "Mesi nel grafico",
       "languageLabel": "Lingua",
       "language": {
@@ -249,8 +250,8 @@
       "editOrder": "Modifica ordine",
       "doneOrder": "Fine ordine",
       "addWallet": "Aggiungi wallet",
-      "newLiquidityTitle": "Nuovo wallet liquidità",
-      "newInvestTitle": "Nuovo wallet investimenti",
+      "newLiquidityTitle": "Aggiungi un nuovo wallet",
+      "newInvestTitle": "Aggiungi un nuovo wallet",
       "categoriesTitle": "Categorie di spesa",
       "newCategoryLabel": "Nome categoria",
       "addCategory": "Aggiungi categoria",

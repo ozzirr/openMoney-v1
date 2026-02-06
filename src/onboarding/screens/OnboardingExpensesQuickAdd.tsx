@@ -7,6 +7,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useDashboardTheme } from "@/ui/dashboard/theme";
 import { OnboardingStackParamList } from "@/onboarding/OnboardingNavigator";
 import { useOnboardingDraft, OnboardingExpenseForm } from "@/onboarding/state/OnboardingContext";
+import { useSettings } from "@/settings/useSettings";
 
 const formatToday = () => new Date().toISOString().split("T")[0];
 
@@ -30,6 +31,7 @@ const expenseIsValid = (expense: OnboardingExpenseForm) => {
 
 export default function OnboardingExpensesQuickAdd(): JSX.Element {
   const { tokens } = useDashboardTheme();
+  const { scrollBounceEnabled } = useSettings();
   const navigation =
     useNavigation<NativeStackNavigationProp<OnboardingStackParamList, "OnboardingExpensesQuickAdd">>();
   const { draft, addExpense, updateExpense } = useOnboardingDraft();
@@ -117,7 +119,12 @@ export default function OnboardingExpensesQuickAdd(): JSX.Element {
 
   return (
     <SafeAreaView style={[styles.root, { backgroundColor: tokens.colors.bg }]}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        bounces={scrollBounceEnabled}
+        alwaysBounceVertical={scrollBounceEnabled}
+        overScrollMode={scrollBounceEnabled ? "always" : "never"}
+      >
         <Text style={[styles.title, { color: tokens.colors.text }]}>Aggiungi le tue spese</Text>
         <Text style={[styles.subtitle, { color: tokens.colors.muted }]}>
           Inserisci almeno due uscite per tenere traccia delle spese iniziali.
